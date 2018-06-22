@@ -22,15 +22,16 @@ def _renderQA(self,data,qfmt=None,afmt=None):
     flist = splitFields(data[6])
     mc_fields = []
     mc_answer = ''
+    mc_ansfld = ''
     
     for (name, (idx, conf)) in self.models.fieldMap(model).items():
         if re.match('^MC_[0-9]+', name):
             if flist[idx] != '':
                 mc_fields.append(flist[idx])
-        if name == u'MC_{0}'.format(mc_answer):
+        if name == u'MC_{0}'.format(mc_ansfld):
             mc_answer = flist[idx]
         if name == u'MC_Ans':
-            mc_answer = flist[idx]
+            mc_ansfld = flist[idx]
     def tmpFieldMap(m):
         "Mapping of field name -> (ord, field)."
         d = dict((f['name'], (f['ord'], f)) for f in m['flds'])
