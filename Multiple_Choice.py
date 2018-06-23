@@ -24,18 +24,18 @@ def _renderQA(self,data,qfmt=None,afmt=None):
     mc_answer = ''
     mc_ansfld = ''
     
-    for (name, (idx, conf)) in self.models.fieldMap(model).items():
+    for (name, (idx, conf)) in list(self.models.fieldMap(model).items()):
         if re.match('^MC_[0-9]+', name):
             if flist[idx] != '':
                 mc_fields.append(flist[idx])
-        if name == u'MC_{0}'.format(mc_ansfld):
+        if name == 'MC_{0}'.format(mc_ansfld):
             mc_answer = flist[idx]
-        if name == u'MC_Ans':
+        if name == 'MC_Ans':
             mc_ansfld = flist[idx]
     def tmpFieldMap(m):
         "Mapping of field name -> (ord, field)."
         d = dict((f['name'], (f['ord'], f)) for f in m['flds'])
-        newFields = [u'MC_Questions', u'MC_Answer']
+        newFields = ['MC_Questions', 'MC_Answer']
         for i,f in enumerate(newFields):
             d[f] = (len(m['flds'])+i,0)
         return d
@@ -48,11 +48,11 @@ def _renderQA(self,data,qfmt=None,afmt=None):
         if answer == mc_answer:
             answer_index = i
             break
-    mc_fields = [u'({0}) {1}'.format(i+1, val) for i, val in enumerate(mc_fields)]
-    data[6] += u'<br>'.join(mc_fields)
+    mc_fields = ['({0}) {1}'.format(i+1, val) for i, val in enumerate(mc_fields)]
+    data[6] += '<br>'.join(mc_fields)
     data[6] += "\x1f"
     if answer_index != -1 and len(mc_fields) > answer_index:
-        mc_fields[answer_index] = u'<span style="color: blue;">{0}</span>'.format(mc_fields[answer_index])
+        mc_fields[answer_index] = '<span style="color: blue;">{0}</span>'.format(mc_fields[answer_index])
     data[6] += '<br>'.join(mc_fields)
     result = oldRenderQA(self,data,qfmt,afmt)
     data = origdata
@@ -60,7 +60,7 @@ def _renderQA(self,data,qfmt=None,afmt=None):
     return result
     
 def previewCards(self, note, type=0):
-    existingTemplates = {c.template()[u'name'] : c for c in note.cards()}
+    existingTemplates = {c.template()['name'] : c for c in note.cards()}
     if type == 0:
         cms = self.findTemplates(note)
     elif type == 1:
@@ -71,8 +71,8 @@ def previewCards(self, note, type=0):
         return []
     cards = []
     for template in cms:
-        if template[u'name'] in existingTemplates:
-            card = existingTemplates[template[u'name']]
+        if template['name'] in existingTemplates:
+            card = existingTemplates[template['name']]
         else:
             card = self._newCard(note, template, 1, flush=False)
         cards.append(card)
