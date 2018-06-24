@@ -48,7 +48,7 @@ def _renderQA(self,data,qfmt=None,afmt=None):
         if answer == mc_answer:
             answer_index = i
             break
-    mc_fields = ['({0}) {1}'.format(i+1, val) for i, val in enumerate(mc_fields)]
+    mc_fields = ['({0}) {1}'.format(chr(i+65), val) for i, val in enumerate(mc_fields)]
     data[6] += '<br>'.join(mc_fields)
     data[6] += "\x1f"
     if answer_index != -1 and len(mc_fields) > answer_index:
