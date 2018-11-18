@@ -9,6 +9,7 @@ import logging
 import re
 import sys
 
+
 class mcKprim:
     """Represents a multiple choice question of the Kprim type."""
     def __init__(self, id):
@@ -19,6 +20,7 @@ class mcKprim:
         self.answers = []
         self.sources = ""
         self.extra1 = ""
+
 
 class mcA:
     """Represents a multiple choice question of the A type."""
@@ -31,39 +33,38 @@ class mcA:
         self.sources = ""
         self.extra1 = ""
 
+
 # configure logging
-logging.basicConfig(level = logging.INFO, filename = "ilias_to_anki.log",
-                    format =  "%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.INFO, filename="ilias_to_anki.log",
+                    format="%(asctime)s - %(levelname)s - %(message)s")
 
 # configure argparse
-parser = argparse.ArgumentParser(description = "Convert MC questions from "
-                                + "ILIAS result sites to Anki-importable "
-                                + "CSV files.")
-parser.add_argument("inputfile", action = "store", metavar = "file",
-                    type = str, help = "path to html file of the ILIAS "
+parser = argparse.ArgumentParser(description="Convert MC questions from "
+                                 + "ILIAS result sites to Anki-importable "
+                                 + "CSV files.")
+parser.add_argument("inputfile", action="store", metavar="file",
+                    type=str, help="path to html file of the ILIAS "
                     + "results site")
-parser.add_argument("-t", "--tags", help = "tags to add to all notes",
-                    default = "", type = str, action = "store")
+parser.add_argument("-t", "--tags", help="tags to add to all notes",
+                    default="", type=str, action="store")
 args = parser.parse_args()
 
 try:
     logging.debug("Opening file...")
-    f = open(args.inputfile, "r")
-    logging.debug("Done.")
+    with open(args.inputfile, "r") as f:
+        logging.debug("Done.")
+        logging.debug("Parsing html...")
+        soup = bs4.BeautifulSoup(f, "html.parser")
+        logging.debug("Done.")
 except FileNotFoundError as err:
     logging.error("File " + args.inputfile + " not found.")
     print(str(err))
     sys.exit(1)
 
-logging.debug("Parsing html...")
-soup = bs4.BeautifulSoup(f, "html.parser")
-logging.debug("Done.")
-f.close()
-
 # find Kprim type multiple choice questions
 kprim_html_tags = soup.select(".solution .ilc_question_KprimChoice")
 for i in range(len(kprim_html_tags)):
-     for parent in kprim_html_tags[i].parents:
+    for parent in kprim_html_tags[i].parents:
         if parent.get("class") and "pdfContent" in parent.get("class"):
             kprim_html_tags[i] = parent
 logging.debug("Found " + str(len(kprim_html_tags)) + " Kprim type questions.")
@@ -72,7 +73,7 @@ logging.debug("Found " + str(len(kprim_html_tags)) + " Kprim type questions.")
 idregex = re.compile(r"\[ID: (\d+)\]")
 kprim_questions = []
 for i in range(len(kprim_html_tags)):
-    title_tag = kprim_html_tags[i].find(class_ = "questionTitle")
+    title_tag = kprim_html_tags[i].find(class_="questionTitle")
     mo = idregex.search(title_tag.get_text())
     id = int(mo.groups()[0])
     kprim_questions.append(mcKprim(id))
@@ -80,13 +81,13 @@ for i in range(len(kprim_html_tags)):
 # get question titles
 titleregex = re.compile(r"^\d+\. +((.*)\w) +\[")
 for i in range(len(kprim_html_tags)):
-    title_tag = kprim_html_tags[i].find(class_ = "questionTitle")
+    title_tag = kprim_html_tags[i].find(class_="questionTitle")
     mo = titleregex.search(title_tag.get_text())
     kprim_questions[i].title = mo.groups()[0]
 
 # get question text
 for i in range(len(kprim_html_tags)):
-    question_tag = kprim_html_tags[i].find(class_ = "ilc_qtitle_Title")
+    question_tag = kprim_html_tags[i].find(class_="ilc_qtitle_Title")
     qtext = question_tag.get_text()
     kprim_questions[i].qtext = qtext.strip()
 
@@ -119,7 +120,7 @@ for question in kprim_questions:
 # get extra text
 feedbackregex = re.compile(r"ilc_qfeed(w|r)_Feedback(Wrong|Right)")
 for i in range(len(kprim_html_tags)):
-    feedback_tag = kprim_html_tags[i].find(class_ = feedbackregex)
+    feedback_tag = kprim_html_tags[i].find(class_=feedbackregex)
     if feedback_tag:
         kprim_questions[i].extra1 = feedback_tag.get_text().strip()
 
@@ -155,23 +156,22 @@ for question in kprim_questions:
     kprim_csv += ',"' + tagstring + '"\n'
 kprim_csv = kprim_csv.strip()
 logging.debug("CSV text for Kprim questions is " + str(len(kprim_csv))
-            + " chars long.")
+              + " chars long.")
 
 # write the file
 kprimfilename = args.inputfile.strip(".html") + "_Kprim.csv"
 logging.debug("Writing Kprim questions to " + kprimfilename)
-f = open(kprimfilename, "w")
-f.write(kprim_csv)
-f.close()
+with open(kprimfilename, "w") as f:
+    f.write(kprim_csv)
 logging.info("Wrote Kprim questions from " + args.inputfile + " to "
-            + kprimfilename)
+             + kprimfilename)
 print("Wrote " + str(len(kprim_questions)) + " Kprim questions from "
-    + args.inputfile + " to " + kprimfilename)
+      + args.inputfile + " to " + kprimfilename)
 
 # find A type multiple choice questions
 mca_html_tags = soup.select(".solution .ilc_question_SingleChoice")
 for i in range(len(mca_html_tags)):
-     for parent in mca_html_tags[i].parents:
+    for parent in mca_html_tags[i].parents:
         if parent.get("class") and "pdfContent" in parent.get("class"):
             mca_html_tags[i] = parent
 logging.debug("Found " + str(len(mca_html_tags)) + " A type questions.")
@@ -180,7 +180,7 @@ logging.debug("Found " + str(len(mca_html_tags)) + " A type questions.")
 idregex = re.compile(r"\[ID: (\d+)\]")
 a_questions = []
 for i in range(len(mca_html_tags)):
-    title_tag = mca_html_tags[i].find(class_ = "questionTitle")
+    title_tag = mca_html_tags[i].find(class_="questionTitle")
     mo = idregex.search(title_tag.get_text())
     id = int(mo.groups()[0])
     a_questions.append(mcA(id))
@@ -188,13 +188,13 @@ for i in range(len(mca_html_tags)):
 # get question titles
 titleregex = re.compile(r"^\d+\. +((.*)\w) +\[")
 for i in range(len(mca_html_tags)):
-    title_tag = mca_html_tags[i].find(class_ = "questionTitle")
+    title_tag = mca_html_tags[i].find(class_="questionTitle")
     mo = titleregex.search(title_tag.get_text())
     a_questions[i].title = mo.groups()[0]
 
 # get question text
 for i in range(len(mca_html_tags)):
-    question_tag = mca_html_tags[i].find(class_ = "ilc_qtitle_Title")
+    question_tag = mca_html_tags[i].find(class_="ilc_qtitle_Title")
     qtext = question_tag.get_text()
     a_questions[i].qtext = qtext.strip()
 
@@ -226,7 +226,7 @@ for question in a_questions:
 # get extra text
 feedbackregex = re.compile(r"ilc_qfeed(w|r)_Feedback(Wrong|Right)")
 for i in range(len(mca_html_tags)):
-    feedback_tag = mca_html_tags[i].find(class_ = feedbackregex)
+    feedback_tag = mca_html_tags[i].find(class_=feedbackregex)
     if feedback_tag:
         a_questions[i].extra1 = feedback_tag.get_text().strip()
 
@@ -262,15 +262,14 @@ for question in a_questions:
     a_csv += ',"' + tagstring + '"\n'
 a_csv = a_csv.strip()
 logging.debug("CSV text for A questions is " + str(len(a_csv))
-            + " chars long.")
+              + " chars long.")
 
 # write the file
 mca_filename = args.inputfile.strip(".html") + "_A.csv"
 logging.debug("Writing A questions to " + mca_filename)
-f = open(mca_filename, "w")
-f.write(a_csv)
-f.close()
+with open(mca_filename, "w") as f:
+    f.write(a_csv)
 logging.info("Wrote A questions from " + args.inputfile + " to "
-            + mca_filename)
+             + mca_filename)
 print("Wrote " + str(len(a_questions)) + " A questions from "
-    + args.inputfile + " to " + mca_filename)
+      + args.inputfile + " to " + mca_filename)
