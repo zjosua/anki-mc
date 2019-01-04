@@ -79,11 +79,11 @@ for i in range(len(kprim_html_tags)):
     kprim_questions.append(mcKprim(id))
 
 # get question titles
-titleregex = re.compile(r"^\d+\. +((.*)\w) +\[")
+titleregex = re.compile(r"^\d+\. +(.*) +\[")
 for i in range(len(kprim_html_tags)):
     title_tag = kprim_html_tags[i].find(class_="questionTitle")
     mo = titleregex.search(title_tag.get_text())
-    kprim_questions[i].title = mo.groups()[0]
+    kprim_questions[i].title = mo.groups()[0].strip()
 
 # get question text
 for i in range(len(kprim_html_tags)):
@@ -186,11 +186,11 @@ for i in range(len(mca_html_tags)):
     a_questions.append(mcA(id))
 
 # get question titles
-titleregex = re.compile(r"^\d+\. +((.*)\w) +\[")
+titleregex = re.compile(r"^\d+\. +(.*) +\[")
 for i in range(len(mca_html_tags)):
     title_tag = mca_html_tags[i].find(class_="questionTitle")
     mo = titleregex.search(title_tag.get_text())
-    a_questions[i].title = mo.groups()[0]
+    a_questions[i].title = mo.groups()[0].strip()
 
 # get question text
 for i in range(len(mca_html_tags)):
