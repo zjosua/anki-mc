@@ -94,7 +94,7 @@ for i in range(len(kprim_html_tags)):
 # get answer options
 optionsregex = re.compile(r"(\n|\t)*(.*)(\n|\t)*")
 for i in range(len(kprim_html_tags)):
-    optiontext_tags = kprim_html_tags[i].select(".solution .col-sm-4")
+    optiontext_tags = kprim_html_tags[i].select(".solution .col-sm-6")
     for j in range(len(optiontext_tags)):
         mo = optionsregex.search(optiontext_tags[j].get_text())
         kprim_questions[i].options.append(mo.groups()[1])
