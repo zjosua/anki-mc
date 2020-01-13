@@ -34,6 +34,18 @@ class mcA:
         self.extra1 = ""
 
 
+class mcMultipleChoice:
+    """Represents a multiple choice question of the MultipleChoice type."""
+    def __init__(self, id):
+        self.id = id
+        self.title = ""
+        self.qtext = ""
+        self.options = []
+        self.answers = []
+        self.sources = ""
+        self.extra1 = ""
+
+
 # configure logging
 logging.basicConfig(level=logging.INFO, filename="ilias_to_anki.log",
                     format="%(asctime)s - %(levelname)s - %(message)s")
@@ -273,3 +285,109 @@ logging.info("Wrote A questions from " + args.inputfile + " to "
              + mca_filename)
 print("Wrote " + str(len(a_questions)) + " A questions from "
       + args.inputfile + " to " + mca_filename)
+
+# find MultpileChoice type multiple choice questions
+mcmc_html_tags = soup.select(".solution .ilc_question_MultipleChoice")
+for i in range(len(mcmc_html_tags)):
+    for parent in mcmc_html_tags[i].parents:
+        if parent.get("class") and "pdfContent" in parent.get("class"):
+            mcmc_html_tags[i] = parent
+logging.debug("Found " + str(len(mcmc_html_tags)) + " MC type questions.")
+
+# get question ids and create mcA objects
+idregex = re.compile(r"\[ID: (\d+)\]")
+mc_questions = []
+for i in range(len(mcmc_html_tags)):
+    title_tag = mcmc_html_tags[i].find(class_="questionTitle")
+    mo = idregex.search(title_tag.get_text())
+    id = int(mo.groups()[0])
+    mc_questions.append(mcA(id))
+
+# get question titles
+titleregex = re.compile(r"^\d+\. +(.*) +\[")
+for i in range(len(mcmc_html_tags)):
+    title_tag = mcmc_html_tags[i].find(class_="questionTitle")
+    mo = titleregex.search(title_tag.get_text())
+    mc_questions[i].title = mo.groups()[0].strip()
+
+# get question text
+for i in range(len(mcmc_html_tags)):
+    question_tag = mcmc_html_tags[i].find(class_="ilc_qtitle_Title")
+    qtext = question_tag.get_text()
+    mc_questions[i].qtext = qtext.strip()
+
+# get answer options
+optionsregex = re.compile(r"(\n|\t)*(.*)(\n|\t)*")
+for i in range(len(mcmc_html_tags)):
+    optiontext_tags = mcmc_html_tags[i].select(".solution .answertext")
+    for j in range(len(optiontext_tags)):
+        mo = optionsregex.search(optiontext_tags[j].get_text())
+        mc_questions[i].options.append(mo.groups()[1])
+    while len(mc_questions[i].options) < 5:
+        mc_questions[i].options.append("")
+
+# get answers
+for i in range(len(mcmc_html_tags)):
+    option_tags = mcmc_html_tags[i].select(".solution .ilc_qanswer_Answer")
+    for j in range(len(option_tags)):
+        if option_tags[j].find("img")["title"] == "Ausgewählt":
+            mc_questions[i].answers.append(True)
+        elif option_tags[j].find("img")["title"] == "Nicht ausgewählt":
+            mc_questions[i].answers.append(False)
+
+# get quiz title and write sources
+quiztitle = soup.select("#il_mhead_t_focus")[0].get_text()
+sourceprefix = "ILIAS, " + quiztitle
+for question in mc_questions:
+    question.sources = sourceprefix + ", ID: " + str(question.id)
+
+# get extra text
+feedbackregex = re.compile(r"ilc_qfeed(w|r)_Feedback(Wrong|Right)")
+for i in range(len(mcmc_html_tags)):
+    feedback_tag = mcmc_html_tags[i].find(class_=feedbackregex)
+    if feedback_tag:
+        mc_questions[i].extra1 = feedback_tag.get_text().strip()
+
+# create CSV text
+logging.debug("Creating CSV text for MC questions...")
+newlineregex = re.compile(r"(\r|\n)")
+doublequoteregex = re.compile(r'"')
+mc_csv = ""
+for question in mc_questions:
+    mc_csv += '"' + question.title + '"'
+    qtextstring = newlineregex.sub("<br />", question.qtext)
+    qtextstring = doublequoteregex.sub('""', qtextstring)
+    mc_csv += ',"' + newlineregex.sub("<br />", question.qtext) + '"'
+    for option in question.options:
+        optstring = newlineregex.sub("<br />", option)
+        optstring = doublequoteregex.sub('""', optstring)
+        mc_csv += ',"' + optstring + '"'
+    ansstring = ""
+    for answer in question.answers:
+        if answer:
+            ansstring += "1 "
+        else:
+            ansstring += "0 "
+    mc_csv += ',"' + ansstring.strip() + '"'
+    srcstring = newlineregex.sub("<br />", question.sources)
+    srcstring = doublequoteregex.sub('""', srcstring)
+    mc_csv += ',"' + srcstring + '"'
+    extrastring = newlineregex.sub("<br />", question.extra1)
+    extrastring = doublequoteregex.sub('""', extrastring)
+    mc_csv += ',"' + extrastring + '"'
+    tagstring = newlineregex.sub("<br />", args.tags.strip())
+    tagstring = doublequoteregex.sub('""', tagstring)
+    mc_csv += ',"' + tagstring + '"\n'
+mc_csv = mc_csv.strip()
+logging.debug("CSV text for MC questions is " + str(len(mc_csv))
+              + " chars long.")
+
+# write the file
+mcmc_filename = args.inputfile.strip(".html") + "_MC.csv"
+logging.debug("Writing MC questions to " + mcmc_filename)
+with open(mcmc_filename, "w") as f:
+    f.write(mc_csv)
+logging.info("Wrote MC questions from " + args.inputfile + " to "
+             + mcmc_filename)
+print("Wrote " + str(len(mc_questions)) + " MC questions from "
+      + args.inputfile + " to " + mcmc_filename)
