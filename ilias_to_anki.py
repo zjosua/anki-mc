@@ -172,13 +172,14 @@ logging.debug("CSV text for Kprim questions is " + str(len(kprim_csv))
 
 # write the file
 kprimfilename = args.inputfile.strip(".html") + "_Kprim.csv"
-logging.debug("Writing Kprim questions to " + kprimfilename)
-with open(kprimfilename, "w") as f:
-    f.write(kprim_csv)
-logging.info("Wrote Kprim questions from " + args.inputfile + " to "
-             + kprimfilename)
-print("Wrote " + str(len(kprim_questions)) + " Kprim questions from "
-      + args.inputfile + " to " + kprimfilename)
+if len(kprim_questions) > 0:
+    logging.debug("Writing Kprim questions to " + kprimfilename)
+    with open(kprimfilename, "w") as f:
+        f.write(kprim_csv)
+    logging.info("Wrote Kprim questions from " + args.inputfile + " to "
+                 + kprimfilename)
+    print("Wrote " + str(len(kprim_questions)) + " Kprim questions from "
+          + args.inputfile + " to " + kprimfilename)
 
 # find A type multiple choice questions
 mca_html_tags = soup.select(".solution .ilc_question_SingleChoice")
@@ -278,13 +279,14 @@ logging.debug("CSV text for A questions is " + str(len(a_csv))
 
 # write the file
 mca_filename = args.inputfile.strip(".html") + "_A.csv"
-logging.debug("Writing A questions to " + mca_filename)
-with open(mca_filename, "w") as f:
-    f.write(a_csv)
-logging.info("Wrote A questions from " + args.inputfile + " to "
-             + mca_filename)
-print("Wrote " + str(len(a_questions)) + " A questions from "
-      + args.inputfile + " to " + mca_filename)
+if len(a_questions) > 0:
+    logging.debug("Writing A questions to " + mca_filename)
+    with open(mca_filename, "w") as f:
+        f.write(a_csv)
+    logging.info("Wrote A questions from " + args.inputfile + " to "
+                 + mca_filename)
+    print("Wrote " + str(len(a_questions)) + " A questions from "
+          + args.inputfile + " to " + mca_filename)
 
 # find MultpileChoice type multiple choice questions
 mcmc_html_tags = soup.select(".solution .ilc_question_MultipleChoice")
@@ -384,10 +386,11 @@ logging.debug("CSV text for MC questions is " + str(len(mc_csv))
 
 # write the file
 mcmc_filename = args.inputfile.strip(".html") + "_MC.csv"
-logging.debug("Writing MC questions to " + mcmc_filename)
-with open(mcmc_filename, "w") as f:
-    f.write(mc_csv)
-logging.info("Wrote MC questions from " + args.inputfile + " to "
-             + mcmc_filename)
-print("Wrote " + str(len(mc_questions)) + " MC questions from "
-      + args.inputfile + " to " + mcmc_filename)
+if len(mc_questions) > 0:
+    logging.debug("Writing MC questions to " + mcmc_filename)
+    with open(mcmc_filename, "w") as f:
+        f.write(mc_csv)
+    logging.info("Wrote MC questions from " + args.inputfile + " to "
+                 + mcmc_filename)
+    print("Wrote " + str(len(mc_questions)) + " MC questions from "
+          + args.inputfile + " to " + mcmc_filename)
