@@ -1,0 +1,15 @@
+{
+    "display_name": "Multiple Choice",
+    "module_name": "multiple_choice",
+    "repo_name": "anki-mc",
+    "ankiweb_id": "",
+    "author": "zjosua",
+    "contact": "https://github.com/zjosua",
+    "homepage": "https://github.com/zjosua/anki-mc",
+    "copyright_start": 2018,
+    "tags": "reviewer",
+    "conflicts": [],
+    "targets": [
+        "anki21"
+    ]
+}
