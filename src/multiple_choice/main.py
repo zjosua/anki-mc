@@ -57,7 +57,7 @@ def on_js_message(handled, msg, context):
 
 # Insert user selection and solutions on the back
 def prepare_answer(a, c, kind):
-    if c.model()["name"] not in ["MC A py", "MC KPrim py"]:
+    if c.model()["name"] not in ["Single Choice", "Multiple Choice", "Kprim"]:
         return a
     if kind != "reviewAnswer":
         return a
