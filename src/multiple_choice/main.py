@@ -35,7 +35,8 @@ def on_js_message(handled, msg, context):
 
     if msg.startswith("mc_user_sel:"):
         # Get the question table
-        qtable_pattern = re.compile(r"qtable:(.*?);", re.MULTILINE | re.DOTALL)
+        qtable_pattern = re.compile(r"qtable:(.*?);;",
+                                    re.MULTILINE | re.DOTALL)
         mo = qtable_pattern.search(msg)
         mw._multiple_choice.qtable = mo.group(1)
 
