@@ -50,8 +50,6 @@ def on_js_message(handled, msg, context):
         mo = s_pattern.search(msg)
         mw._multiple_choice.solution = mo.group(1)
 
-        mw.reviewer._showAnswer()
-
         return True, None
 
     return handled
