@@ -17,8 +17,7 @@
 
 import re
 
-from anki import hooks
-from aqt import gui_hooks, mw
+from aqt import mw
 
 
 class MultipleChoice:
@@ -73,7 +72,3 @@ def prepare_answer(a, c, kind):
     s_pattern = re.compile(r"solutions_here")
     a = s_pattern.sub(mw._multiple_choice.solution, a)
     return a
-
-mw._multiple_choice = MultipleChoice()
-gui_hooks.webview_did_receive_js_message.append(on_js_message)
-gui_hooks.card_will_show.append(prepare_answer)
