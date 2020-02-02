@@ -189,25 +189,26 @@ function onLoad() {
 
 	var answers = document.getElementById("user_answers").innerHTML;
 	answers = answers.split(" ");
-	for (i = 0; i < answers.length; i++) {
-		answers[i] = Number(answers[i]);
-	}
 
 	var output = document.getElementById("output");
 
 	var atable = document.getElementById("qtable").cloneNode(true);
 	atable.setAttribute("id", "atable");
-	output.innerHTML = "<hr id='answer' /><br />" + atable.outerHTML;
+	output.innerHTML = "<hr id='answer' />" + atable.outerHTML;
 
 	var qrows = document.getElementById("qtable").getElementsByTagName("tr");
 
 	for (i = 0; i < answers.length; i++) {
 		//Set the radio buttons in the qtable.
-		qrows[i+1].getElementsByTagName("td")[answers[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
+		if (answers[i] === "1") {
+			qrows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = true;
+		} else if (answers[i] === "0") {
+			qrows[i+1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].checked = true;
+		}
 		//Colorize the qtable.
-		if (solutions[i] && answers[i]) {
+		if (solutions[i] && answers[i] === "1") {
 			qrows[i+1].setAttribute("class", "correct");
-		} else if (!solutions[i] && !answers[i]){
+		} else if (!solutions[i] && answers[i] === "0"){
 			qrows[i+1].setAttribute("class", "correct");
 		} else {
 			qrows[i+1].setAttribute("class", "wrong");
