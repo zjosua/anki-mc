@@ -264,16 +264,15 @@ card_css = """\
 }
 
 table, td, th {
- border: 1px solid black;
  border-collapse: collapse;
  padding: 5px;
 }
 
-.nightMode table, td, th {
- border-color: white;
+.correct {
+	background-color: lime;
 }
 
-.correct {
+.nightMode .correct {
 	background-color: #009900;
 }
 
