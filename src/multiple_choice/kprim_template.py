@@ -79,7 +79,7 @@ function onShuffle() {
 
 	for (i = 0; i < qrows.length - 1; i++) {
 		qanda[i] = new Object();
-		qanda[i].question = qrows[i+1].getElementsByTagName("td")[1].innerHTML;
+		qanda[i].question = qrows[i+1].getElementsByTagName("td")[2].innerHTML;
 		qanda[i].answer = solutions[i];
 	}
 
@@ -88,7 +88,7 @@ function onShuffle() {
 	var mc_solutions = new String();
 
 	for (i = 0; i < qrows.length - 1; i++) {
-		qrows[i+1].getElementsByTagName("td")[1].innerHTML = qanda[i].question;
+		qrows[i+1].getElementsByTagName("td")[2].innerHTML = qanda[i].question;
 		solutions[i] = qanda[i].answer;
 		mc_solutions += qanda[i].answer + " ";
 	}
@@ -107,8 +107,10 @@ function onCheck() {
 	for (i = 0; i < qrows.length - 1; i++) {
 		if (qrows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked) {
 			document.getElementById("user_answers").innerHTML += "1 ";
-		} else {
+		} else if (qrows[i+1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].checked) {
 			document.getElementById("user_answers").innerHTML += "0 ";
+		} else {
+			document.getElementById("user_answers").innerHTML += "- ";
 		}
 	}
 	document.getElementById("user_answers").innerHTML = document.getElementById("user_answers").innerHTML.trim();
@@ -141,39 +143,39 @@ if (document.readyState === "complete") {
 }
 </script>
 
-{{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
+{{#Title}}<h3>{{Title}}<br /></h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
 <form>
 	<table style="boder: 1px solid black" id="qtable">
 		<tbody>
 			<tr>
-				<th></th><th>Aussage</th>
+				<th>richtig</th><th>falsch</th><th>Aussage</th>
 			</tr>
 			{{#MC_1}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="ans_1" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="ans_1" type="radio" value="0"></td>
 				<td>{{MC_1}}</td>
 			</tr>{{/MC_1}}
 			{{#MC_2}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="ans_2" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="ans_2" type="radio" value="0"></td>
 				<td>{{MC_2}}</td>
 			</tr>{{/MC_2}}
 			{{#MC_3}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="ans_3" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="ans_3" type="radio" value="0"></td>
 				<td>{{MC_3}}</td>
 			</tr>{{/MC_3}}
 			{{#MC_4}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="ans_4" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="ans_4" type="radio" value="0"></td>
 				<td>{{MC_4}}</td>
 			</tr>{{/MC_4}}
-			{{#MC_5}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
-				<td>{{MC_5}}</td>
-			</tr>{{/MC_5}}
 		</tbody>
 	</table>
 </form>
 <div class="hidden" id="MC_solutions">{{Answers}}</div>
-<div class="hidden" id="user_answers">- - - - -</div>\
+<div class="hidden" id="user_answers">- - - -</div>\
 """
 
 card_back = """\
@@ -201,7 +203,7 @@ function onLoad() {
 
 	for (i = 0; i < answers.length; i++) {
 		//Set the radio buttons in the qtable.
-		qrows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = answers[i] ? true : false;
+		qrows[i+1].getElementsByTagName("td")[answers[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
 		//Colorize the qtable.
 		if (solutions[i] && answers[i]) {
 			qrows[i+1].setAttribute("class", "correct");
@@ -216,9 +218,10 @@ function onLoad() {
 
 	for (i = 0; i < solutions.length; i++) {
 		//Rename the radio buttons of the atable to avoid interference with those in the qtable.
-		arows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "MC_A_solution");
+		arows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "solution_" + String(i+1));
+		arows[i+1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].setAttribute("name", "solution_" + String(i+1));
 		//Set the radio buttons in the atable.
-		arows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
+		arows[i+1].getElementsByTagName("td")[solutions[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
 	}
 }
 
@@ -270,10 +273,6 @@ table, td, th {
 }
 
 .correct {
-	background-color: lime;
-}
-
-.nightMode .correct {
 	background-color: #009900;
 }
 
@@ -297,16 +296,15 @@ table, td, th {
 }\
 """
 
-sc_model = "Single Choice"
-sc_card = "Single Choice"
-sc_fields = {
+kprim_model = "Kprim"
+kprim_card = "Kprim"
+kprim_fields = {
     "title": "Title",
     "question": "Question",
     "mc1": "MC_1",
     "mc2": "MC_2",
     "mc3": "MC_3",
     "mc4": "MC_4",
-    "mc5": "MC_5",
     "answers": "Answers",
     "sources": "Sources",
     "extra": "Extra 1"
@@ -315,14 +313,14 @@ sc_fields = {
 def addModel(col):
     """Add add-on note type to collection"""
     models = col.models
-    model = models.new(sc_model)
+    model = models.new(kprim_model)
     model['type'] = MODEL_STD
     # Add fields:
-    for i in sc_fields.keys():
-        fld = models.newField(sc_fields[i])
+    for i in kprim_fields.keys():
+        fld = models.newField(kprim_fields[i])
         models.addField(model, fld)
     # Add template
-    template = models.newTemplate(sc_card)
+    template = models.newTemplate(kprim_card)
     template['qfmt'] = card_front
     template['afmt'] = card_back
     model['css'] = card_css
@@ -333,8 +331,8 @@ def addModel(col):
 
 def updateTemplate(col):
     """Update add-on card templates"""
-    print("Updating %s card template".format(sc_model))
-    model = col.models.byName(sc_model)
+    print("Updating %s card template".format(kprim_model))
+    model = col.models.byName(kprim_model)
     template = model['tmpls'][0]
     template['qfmt'] = card_front
     template['afmt'] = card_back
@@ -342,7 +340,7 @@ def updateTemplate(col):
     col.models.save()
     return model
 
-def initializeSCModels():
-    model = mw.col.models.byName(sc_model)
+def initializeKprimModels():
+    model = mw.col.models.byName(kprim_model)
     if not model:
         model = addModel(mw.col)

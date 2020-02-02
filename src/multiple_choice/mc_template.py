@@ -150,23 +150,23 @@ if (document.readyState === "complete") {
 				<th></th><th>Aussage</th>
 			</tr>
 			{{#MC_1}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="MC_1" type="checkbox" value="1"></td>
 				<td>{{MC_1}}</td>
 			</tr>{{/MC_1}}
 			{{#MC_2}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="MC_2" type="checkbox" value="1"></td>
 				<td>{{MC_2}}</td>
 			</tr>{{/MC_2}}
 			{{#MC_3}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="MC_3" type="checkbox" value="1"></td>
 				<td>{{MC_3}}</td>
 			</tr>{{/MC_3}}
 			{{#MC_4}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="MC_4" type="checkbox" value="1"></td>
 				<td>{{MC_4}}</td>
 			</tr>{{/MC_4}}
 			{{#MC_5}}<tr>
-				<td onInput="onCheck()" style="text-align: center"><input name="MC_A" type="radio" value="1"></td>
+				<td onInput="onCheck()" style="text-align: center"><input name="MC_5" type="checkbox" value="1"></td>
 				<td>{{MC_5}}</td>
 			</tr>{{/MC_5}}
 		</tbody>
@@ -216,7 +216,7 @@ function onLoad() {
 
 	for (i = 0; i < solutions.length; i++) {
 		//Rename the radio buttons of the atable to avoid interference with those in the qtable.
-		arows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "MC_A_solution");
+		arows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "MC_" + String(i+1) + "_solution");
 		//Set the radio buttons in the atable.
 		arows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
 	}
@@ -238,8 +238,8 @@ if (document.readyState === "complete") {
 
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
-qtable_here
-<p id="output"></p>
+<form>qtable_here</form>
+<p><form id="output"></form></p>
 <div class="hidden" id="MC_solutions">solutions_here</div>
 <div class="hidden" id="user_answers">user_answers_here</div>
 {{#Sources}}<p class="small" id="sources"><b>Sources:</b><br />{{Sources}}</p>{{/Sources}}
@@ -297,9 +297,9 @@ table, td, th {
 }\
 """
 
-sc_model = "Single Choice"
-sc_card = "Single Choice"
-sc_fields = {
+mc_model = "Multiple Choice"
+mc_card = "Multiple Choice"
+mc_fields = {
     "title": "Title",
     "question": "Question",
     "mc1": "MC_1",
@@ -315,14 +315,14 @@ sc_fields = {
 def addModel(col):
     """Add add-on note type to collection"""
     models = col.models
-    model = models.new(sc_model)
+    model = models.new(mc_model)
     model['type'] = MODEL_STD
     # Add fields:
-    for i in sc_fields.keys():
-        fld = models.newField(sc_fields[i])
+    for i in mc_fields.keys():
+        fld = models.newField(mc_fields[i])
         models.addField(model, fld)
     # Add template
-    template = models.newTemplate(sc_card)
+    template = models.newTemplate(mc_card)
     template['qfmt'] = card_front
     template['afmt'] = card_back
     model['css'] = card_css
@@ -333,8 +333,8 @@ def addModel(col):
 
 def updateTemplate(col):
     """Update add-on card templates"""
-    print("Updating %s card template".format(sc_model))
-    model = col.models.byName(sc_model)
+    print("Updating %s card template".format(mc_model))
+    model = col.models.byName(mc_model)
     template = model['tmpls'][0]
     template['qfmt'] = card_front
     template['afmt'] = card_back
@@ -342,7 +342,7 @@ def updateTemplate(col):
     col.models.save()
     return model
 
-def initializeSCModels():
-    model = mw.col.models.byName(sc_model)
+def initializeMCModels():
+    model = mw.col.models.byName(mc_model)
     if not model:
         model = addModel(mw.col)
