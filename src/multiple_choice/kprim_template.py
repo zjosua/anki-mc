@@ -149,7 +149,7 @@ if (document.readyState === "complete") {
 	<table style="boder: 1px solid black" id="qtable">
 		<tbody>
 			<tr>
-				<th>richtig</th><th>falsch</th><th>Aussage</th>
+				<th>yes</th><th>no</th><th></th>
 			</tr>
 			{{#MC_1}}<tr>
 				<td onInput="onCheck()" style="text-align: center"><input name="ans_1" type="radio" value="1"></td>
@@ -197,7 +197,7 @@ function onLoad() {
 
 	var atable = document.getElementById("qtable").cloneNode(true);
 	atable.setAttribute("id", "atable");
-	output.innerHTML = "richtige Antworten:<br />" + atable.outerHTML;
+	output.innerHTML = "<hr id='answer' /><br />" + atable.outerHTML;
 
 	var qrows = document.getElementById("qtable").getElementsByTagName("tr");
 

@@ -77,9 +77,9 @@ function onShuffle() {
 
 	var qanda = new Array();
 
-	for (i = 0; i < qrows.length - 1; i++) {
+	for (i = 0; i < qrows.length; i++) {
 		qanda[i] = new Object();
-		qanda[i].question = qrows[i+1].getElementsByTagName("td")[1].innerHTML;
+		qanda[i].question = qrows[i].getElementsByTagName("td")[1].innerHTML;
 		qanda[i].answer = solutions[i];
 	}
 
@@ -87,8 +87,8 @@ function onShuffle() {
 
 	var mc_solutions = new String();
 
-	for (i = 0; i < qrows.length - 1; i++) {
-		qrows[i+1].getElementsByTagName("td")[1].innerHTML = qanda[i].question;
+	for (i = 0; i < qrows.length; i++) {
+		qrows[i].getElementsByTagName("td")[1].innerHTML = qanda[i].question;
 		solutions[i] = qanda[i].answer;
 		mc_solutions += qanda[i].answer + " ";
 	}
@@ -104,8 +104,8 @@ function onCheck() {
 	var qrows = document.getElementById("qtable").getElementsByTagName("tr");
 	document.getElementById("user_answers").innerHTML = "";
 
-	for (i = 0; i < qrows.length - 1; i++) {
-		if (qrows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked) {
+	for (i = 0; i < qrows.length; i++) {
+		if (qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked) {
 			document.getElementById("user_answers").innerHTML += "1 ";
 		} else {
 			document.getElementById("user_answers").innerHTML += "0 ";
@@ -146,9 +146,6 @@ if (document.readyState === "complete") {
 <form>
 	<table style="boder: 1px solid black" id="qtable">
 		<tbody>
-			<tr>
-				<th></th><th>Aussage</th>
-			</tr>
 			{{#MC_1}}<tr>
 				<td onInput="onCheck()" style="text-align: center"><input name="MC_1" type="checkbox" value="1"></td>
 				<td>{{MC_1}}</td>
@@ -195,20 +192,20 @@ function onLoad() {
 
 	var atable = document.getElementById("qtable").cloneNode(true);
 	atable.setAttribute("id", "atable");
-	output.innerHTML = "richtige Antworten:<br />" + atable.outerHTML;
+	output.innerHTML = "<hr id='answer' />" + atable.outerHTML;
 
 	var qrows = document.getElementById("qtable").getElementsByTagName("tr");
 
 	for (i = 0; i < answers.length; i++) {
 		//Set the radio buttons in the qtable.
-		qrows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = answers[i] ? true : false;
+		qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = answers[i] ? true : false;
 		//Colorize the qtable.
 		if (solutions[i] && answers[i]) {
-			qrows[i+1].setAttribute("class", "correct");
+			qrows[i].setAttribute("class", "correct");
 		} else if (!solutions[i] && !answers[i]){
-			qrows[i+1].setAttribute("class", "correct");
+			qrows[i].setAttribute("class", "correct");
 		} else {
-			qrows[i+1].setAttribute("class", "wrong");
+			qrows[i].setAttribute("class", "wrong");
 		}
 	}
 
@@ -216,9 +213,9 @@ function onLoad() {
 
 	for (i = 0; i < solutions.length; i++) {
 		//Rename the radio buttons of the atable to avoid interference with those in the qtable.
-		arows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "MC_" + String(i+1) + "_solution");
+		arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "MC_" + String(i+1) + "_solution");
 		//Set the radio buttons in the atable.
-		arows[i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
+		arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
 	}
 }
 
