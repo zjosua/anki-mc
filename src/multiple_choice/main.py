@@ -18,6 +18,7 @@
 import re
 
 from aqt import mw
+from aqt.reviewer import Reviewer
 
 
 class MultipleChoice:
@@ -29,7 +30,7 @@ class MultipleChoice:
 
 # Responding to JS messages
 def on_js_message(handled, msg, context):
-    if context != "reviewer":
+    if not isinstance(context, Reviewer):
         return handled
 
     if msg.startswith("mc_user_sel:"):
