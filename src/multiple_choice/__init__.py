@@ -34,17 +34,10 @@
 
 from aqt import gui_hooks, mw
 
-from .main import *
-from .sc_template import initializeSCModels
-from .mc_template import initializeMCModels
-from .kprim_template import initializeKprimModels
+from .template import initializeModel
 
 def delayedInit():
-    initializeSCModels()
-    initializeMCModels()
-    initializeKprimModels()
+    initializeModel()
 
 gui_hooks.profile_did_open.append(delayedInit)
-gui_hooks.webview_did_receive_js_message.append(on_js_message)
-gui_hooks.card_will_show.append(prepare_answer)
-mw._multiple_choice = MultipleChoice()
+
