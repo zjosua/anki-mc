@@ -45,11 +45,15 @@ from aqt import mw
 
 card_front = """\
 <script>
+    // Loading Persistence
+    // https://github.com/SimonLammer/anki-persistence
     // v0.5.2 - https://github.com/SimonLammer/anki-persistence/blob/62463a7f63e79ce12f7a622a8ca0beb4c1c5d556/script.js
     if (void 0 === window.Persistence) { var _persistenceKey = "github.com/SimonLammer/anki-persistence/", _defaultKey = "_default"; if (window.Persistence_sessionStorage = function () { var e = !1; try { "object" == typeof window.sessionStorage && (e = !0, this.clear = function () { for (var e = 0; e < sessionStorage.length; e++) { var t = sessionStorage.key(e); 0 == t.indexOf(_persistenceKey) && (sessionStorage.removeItem(t), e--) } }, this.setItem = function (e, t) { void 0 == t && (t = e, e = _defaultKey), sessionStorage.setItem(_persistenceKey + e, JSON.stringify(t)) }, this.getItem = function (e) { return void 0 == e && (e = _defaultKey), JSON.parse(sessionStorage.getItem(_persistenceKey + e)) }, this.removeItem = function (e) { void 0 == e && (e = _defaultKey), sessionStorage.removeItem(_persistenceKey + e) }) } catch (e) { } this.isAvailable = function () { return e } }, window.Persistence_windowKey = function (e) { var t = window[e], i = !1; "object" == typeof t && (i = !0, this.clear = function () { t[_persistenceKey] = {} }, this.setItem = function (e, i) { void 0 == i && (i = e, e = _defaultKey), t[_persistenceKey][e] = i }, this.getItem = function (e) { return void 0 == e && (e = _defaultKey), t[_persistenceKey][e] || null }, this.removeItem = function (e) { void 0 == e && (e = _defaultKey), delete t[_persistenceKey][e] }, void 0 == t[_persistenceKey] && this.clear()), this.isAvailable = function () { return i } }, window.Persistence = new Persistence_sessionStorage, Persistence.isAvailable() || (window.Persistence = new Persistence_windowKey("py")), !Persistence.isAvailable()) { var titleStartIndex = window.location.toString().indexOf("title"), titleContentIndex = window.location.toString().indexOf("main", titleStartIndex); titleStartIndex > 0 && titleContentIndex > 0 && titleContentIndex - titleStartIndex < 10 && (window.Persistence = new Persistence_windowKey("qt")) } }
 </script>
 
 <script>
+
+    // Generate the table depending on the type.
 
     function generateTable() {
         var type = document.getElementById("Card_Type").innerHTML;
@@ -115,9 +119,9 @@ card_front = """\
 
         var type = document.getElementById("Card_Type").innerHTML;
 
-        for (i = 0; i < qrows.length - 1; i++) {
+        for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
             qanda[i] = new Object();
-            qanda[i].question = qrows[i + 1].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML;
+            qanda[i].question = qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML;
             qanda[i].answer = solutions[i];
         }
 
@@ -125,8 +129,8 @@ card_front = """\
 
         var mc_solutions = new String();
 
-        for (i = 0; i < qrows.length - 1; i++) {
-            qrows[i + 1].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML = qanda[i].question;
+        for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
+            qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML = qanda[i].question;
             solutions[i] = qanda[i].answer;
             mc_solutions += qanda[i].answer + " ";
         }
@@ -137,6 +141,7 @@ card_front = """\
     }
 
     function onCheck() {
+        // Generate user_answers
         var type = document.getElementById("Card_Type").innerHTML;
         var qrows = document.getElementById("qtable").getElementsByTagName('tbody')[0].getElementsByTagName("tr");
         document.getElementById("user_answers").innerHTML = "";
@@ -158,6 +163,8 @@ card_front = """\
         }
 
         document.getElementById("user_answers").innerHTML = document.getElementById("user_answers").innerHTML.trim();
+
+        // Send Stuff to Persistence
         if (Persistence.isAvailable()) {
             Persistence.clear();
             Persistence.setItem('user_answers', document.getElementById("user_answers").innerHTML);
@@ -166,6 +173,11 @@ card_front = """\
         }
     }
 
+    /*
+        The following block is from Glutanimate's Cloze Overlapper card template.
+        The Cloze Overlapper card template is licensed under the CC BY-SA 4.0
+        license (https://creativecommons.org/licenses/by-sa/4.0/).
+    */
     if (document.readyState === "complete") {
         setTimeout(generateTable(), 1);
 
@@ -179,42 +191,11 @@ card_front = """\
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
 
-<table style="boder: 1px solid black" id="qtable">
-    <!--
-    <tbody>
-        <tr>
-            <th>yes</th>
-            <th>no</th>
-            <th></th>
-        </tr>
-        {{#Q_1}}<tr>
-            <td onInput="onCheck()" style="text-align: center"><input name="ans_1" type="radio" value="1"></td>
-            <td onInput="onCheck()" style="text-align: center"><input name="ans_1" type="radio" value="0"></td>
-            <td>{{Q_1}}</td>
-        </tr>{{/Q_1}}
-        {{#Q_2}}<tr>
-            <td onInput="onCheck()" style="text-align: center"><input name="ans_2" type="radio" value="1"></td>
-            <td onInput="onCheck()" style="text-align: center"><input name="ans_2" type="radio" value="0"></td>
-            <td>{{Q_2}}</td>
-        </tr>{{/Q_2}}
-        {{#Q_3}}<tr>
-            <td onInput="onCheck()" style="text-align: center"><input name="ans_3" type="radio" value="1"></td>
-            <td onInput="onCheck()" style="text-align: center"><input name="ans_3" type="radio" value="0"></td>
-            <td>{{Q_3}}</td>
-        </tr>{{/Q_3}}
-        {{#Q_4}}<tr>
-            <td onInput="onCheck()" style="text-align: center"><input name="ans_4" type="radio" value="1"></td>
-            <td onInput="onCheck()" style="text-align: center"><input name="ans_4" type="radio" value="0"></td>
-            <td>{{Q_4}}</td>
-        </tr>{{/Q_4}}
-    </tbody>-->
-</table>
-
-
+<table style="boder: 1px solid black" id="qtable"></table>
 
 <div class="hidden" id="Q_solutions">{{Answers}}</div>
 <div class="hidden" id="user_answers">- - - -</div>
-<div class="hidden" id="Card_Type">{{QType (0=kprim,1=mc,2=sc)}}</div>
+<div class="hidden" id="Card_Type">{{QType}}</div>
 
 <div class="hidden" id="Q_1">{{Q_1}}</div>
 <div class="hidden" id="Q_2">{{Q_2}}</div>
@@ -225,18 +206,21 @@ card_front = """\
 
 card_back = """\
 <script>
-    // v0.5.2 - https://github.com/SimonLammer/anki-persistence/blob/3912637b7a53cfe8357f3946d0255804386ac43c/script.js
+    // Loading Persistence
+    // https://github.com/SimonLammer/anki-persistence
+    // v0.5.2 - https://github.com/SimonLammer/anki-persistence/blob/62463a7f63e79ce12f7a622a8ca0beb4c1c5d556/script.js
     if (void 0 === window.Persistence) { var _persistenceKey = "github.com/SimonLammer/anki-persistence/", _defaultKey = "_default"; if (window.Persistence_sessionStorage = function () { var e = !1; try { "object" == typeof window.sessionStorage && (e = !0, this.clear = function () { for (var e = 0; e < sessionStorage.length; e++) { var t = sessionStorage.key(e); 0 == t.indexOf(_persistenceKey) && (sessionStorage.removeItem(t), e--) } }, this.setItem = function (e, t) { void 0 == t && (t = e, e = _defaultKey), sessionStorage.setItem(_persistenceKey + e, JSON.stringify(t)) }, this.getItem = function (e) { return void 0 == e && (e = _defaultKey), JSON.parse(sessionStorage.getItem(_persistenceKey + e)) }, this.removeItem = function (e) { void 0 == e && (e = _defaultKey), sessionStorage.removeItem(_persistenceKey + e) }) } catch (e) { } this.isAvailable = function () { return e } }, window.Persistence_windowKey = function (e) { var t = window[e], i = !1; "object" == typeof t && (i = !0, this.clear = function () { t[_persistenceKey] = {} }, this.setItem = function (e, i) { void 0 == i && (i = e, e = _defaultKey), t[_persistenceKey][e] = i }, this.getItem = function (e) { return void 0 == e && (e = _defaultKey), t[_persistenceKey][e] || null }, this.removeItem = function (e) { void 0 == e && (e = _defaultKey), delete t[_persistenceKey][e] }, void 0 == t[_persistenceKey] && this.clear()), this.isAvailable = function () { return i } }, window.Persistence = new Persistence_sessionStorage, Persistence.isAvailable() || (window.Persistence = new Persistence_windowKey("py")), !Persistence.isAvailable()) { var titleStartIndex = window.location.toString().indexOf("title"), titleContentIndex = window.location.toString().indexOf("main", titleStartIndex); titleStartIndex > 0 && titleContentIndex > 0 && titleContentIndex - titleStartIndex < 10 && (window.Persistence = new Persistence_windowKey("qt")) } }
 </script>
 
 <script>
     function onLoad() {
+        // Check if Persistence is Available
         if (Persistence.isAvailable) {
+            // Parsing solutions
             solutions = Persistence.getItem('Q_solutions').split(" ");
             for (i = 0; i < solutions.length; i++) {
                 solutions[i] = Number(solutions[i]);
             }
-
             var answers = Persistence.getItem('user_answers').split(" ");
             var type = document.getElementById('CardType').innerHTML;
 
@@ -261,7 +245,7 @@ card_back = """\
                         qrows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].checked = true;
                     }
                 } else {
-                    qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = answers[i] ? true : false;
+                    qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = (answers[i]==1) ? true : false;
                 }
                 //Colorize the qtable.
                 if (solutions[i] && ((type == 0) ? answers[i] === "1" : answers[i])) {
@@ -302,7 +286,7 @@ card_back = """\
 <div class="hidden" id="MC_solutions">solutions_here</div>
 
 <div class="hidden" id="user_answers">user_answers_here</div>
-<div class="hidden" id="CardType">{{QType (0=kprim,1=mc,2=sc)}}</div>
+<div class="hidden" id="CardType">{{QType}}</div>
 {{#Sources}}<p class="small" id="sources"><b>Sources:</b><br />{{Sources}}</p>{{/Sources}}
 {{#Extra 1}}<p class="small" id="extra1"><b>Extra 1:</b><br />{{Extra 1}}</p>{{/Extra 1}}\
 """

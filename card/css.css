@@ -1,0 +1,43 @@
+.card {
+ font-family: arial;
+ font-size: 20px;
+ text-align: left;
+ color: black;
+ background-color: white;
+}
+
+.small {
+ font-size: 15px;
+}
+
+table, td, th {
+ border-collapse: collapse;
+ padding: 5px;
+}
+
+.correct {
+	background-color: lime;
+}
+
+.nightMode .correct {
+	background-color: #009900;
+}
+
+.wrong {
+	background-color: OrangeRed;
+}
+
+.hidden {
+  /*
+  This block is from Glutanimate's Cloze Overlapper card template.
+  The Cloze Overlapper card template is licensed under the CC BY-SA 4.0
+  license (https://creativecommons.org/licenses/by-sa/4.0/).
+  */
+  /* guarantees a consistent width across front and back */
+  font-weight: bold;
+  display: block;
+  line-height:0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
