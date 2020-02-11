@@ -196,7 +196,7 @@ card_front = """\
 
 <div class="hidden" id="Q_solutions">{{Answers}}</div>
 <div class="hidden" id="user_answers">- - - -</div>
-<div class="hidden" id="Card_Type">{{QType}}</div>
+<div class="hidden" id="Card_Type">{{QType (0=kprim,1=mc,2=sc)}}</div>
 
 <div class="hidden" id="Q_1">{{Q_1}}</div>
 <div class="hidden" id="Q_2">{{Q_2}}</div>
@@ -287,7 +287,7 @@ card_back = """\
 <div class="hidden" id="MC_solutions">solutions_here</div>
 
 <div class="hidden" id="user_answers">user_answers_here</div>
-<div class="hidden" id="CardType">{{QType}}</div>
+<div class="hidden" id="CardType">{{QType (0=kprim,1=mc,2=sc)}}</div>
 {{#Sources}}<p class="small" id="sources"><b>Sources:</b><br />{{Sources}}</p>{{/Sources}}
 {{#Extra 1}}<p class="small" id="extra1"><b>Extra 1:</b><br />{{Extra 1}}</p>{{/Extra 1}}\
 """
@@ -338,32 +338,33 @@ table, td, th {
 }\
 """
 
-kprim_model = "AllInOne (kprim, mc, sc)"
-kprim_card = "AllInOne (kprim, mc, sc)"
-kprim_fields = {
+aio_model = "AllInOne (kprim, mc, sc)"
+aio_card = "AllInOne (kprim, mc, sc)"
+aio_fields = {
+    "title": "Title",
     "question": "Question",
     "qtype": "QType (0=kprim,1=mc,2=sc)",
     "q1": "Q_1",
     "q2": "Q_2",
     "q3": "Q_3",
     "q4": "Q_4",
+    "q5": "Q_5",
     "answers": "Answers",
     "sources": "Sources",
     "extra": "Extra 1"
-    "title": "Title",
 }
 
 def addModel(col):
     """Add add-on note type to collection"""
     models = col.models
-    model = models.new(kprim_model)
+    model = models.new(aio_model)
     model['type'] = MODEL_STD
     # Add fields:
-    for i in kprim_fields.keys():
-        fld = models.newField(kprim_fields[i])
+    for i in aio_fields.keys():
+        fld = models.newField(aio_fields[i])
         models.addField(model, fld)
     # Add template
-    template = models.newTemplate(kprim_card)
+    template = models.newTemplate(aio_card)
     template['qfmt'] = card_front
     template['afmt'] = card_back
     model['css'] = card_css
@@ -384,6 +385,6 @@ def updateTemplate(col):
     return model
 
 def initializeModel():
-    model = mw.col.models.byName(kprim_model)
+    model = mw.col.models.byName(aio_model)
     if not model:
         model = addModel(mw.col)
