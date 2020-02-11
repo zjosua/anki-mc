@@ -11,14 +11,13 @@ Adds multiple choice cards to Anki.
 
 Anki 2.1.20 or higher is required for this add-on to work.
 
-This add-on only works with the Computer version of Anki.
-Cards created with this add-on can't be reviewed with the mobile apps or on AnkiWeb.
+Cards created with this add-on can be reviewed with all Computer and mobile apps and on AnkiWeb.
 
 ### Usage
 
 #### Creating / Editing
 
-The note types are automatically added the first time you start Anki after installing the add-on.
+The note type is automatically added the first time you start Anki after installing the add-on.
 
 When creating cards, write a "1" for correct choices or a "0" for incorrect choices in the "Answers" field.
 These values in the "Answer" field must be separated by a single space.
@@ -39,5 +38,11 @@ The add-on will automatically style your choices based on whether you answered c
 It is licensed under the AGPLv3.
 For more information refer to the [LICENSE](https://github.com/zjosua/anki-mc/blob/master/LICENSE) file.
 
-The files `__init__.py` and the template files are based on the Anki add-on [Cloze Overlapper](https://github.com/glutanimate/cloze-overlapper) by Glutanimate.
-[Click here to support Glutanimate's work.](https://glutanimate.com/support-my-work/)
+The files `__init__.py` and the template file are based on the Anki add-on [Cloze Overlapper](https://github.com/glutanimate/cloze-overlapper) by Glutanimate.
+[Click here to support Glutanimate's work](https://glutanimate.com/support-my-work/).
+
+Persistence is achieved using the code from [Simon Lammer's anki-persistence](https://github.com/SimonLammer/anki-persistence).
+Great work Simon!
+
+[Hax](https://github.com/Schlauer-Hax) merged my Multiple Choice card template with Simon Lammer's persistence code and thus made compatibility with all platforms possible.
+Thanks a lot!
