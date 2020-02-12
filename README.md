@@ -44,5 +44,5 @@ The files `__init__.py` and the template file are based on the Anki add-on [Cloz
 Persistence is achieved using the code from [Simon Lammer's anki-persistence](https://github.com/SimonLammer/anki-persistence).
 Great work Simon!
 
-[Hax](https://github.com/Schlauer-Hax) merged my Multiple Choice card template with Simon Lammer's persistence code and thus made compatibility with all platforms possible.
+[Hax](https://github.com/Schlauer-Hax) merged my Multiple Choice card template with Simon Lammer's persistence code and this made compatibility with all platforms possible.
 Thanks a lot!
