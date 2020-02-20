@@ -21,8 +21,8 @@ The note type is automatically added the first time you start Anki after install
 
 When creating cards, write a "1" for correct choices or a "0" for incorrect choices in the "Answers" field.
 These values in the "Answer" field must be separated by a single space.
-The order and number of values in the "Answer" field must correspond with the choices "MC_1" to "MC_5" (or "MC_4" for "Kprim" cards, respectively).
-If you don't need all the choices, just leave the remaining "MC_" fields blank and only enter as many values as you need in the "Answers" field.
+The order and number of values in the "Answer" field must correspond with the choices "Q_1" to "Q_5".
+If you don't need all the choices, just leave the remaining "Q_" fields blank and only enter as many values as you need in the "Answers" field.
 
 ![Editing](screenshots/edit.png)
 
@@ -44,5 +44,8 @@ The files `__init__.py` and the template file are based on the Anki add-on [Cloz
 Persistence is achieved using the code from [Simon Lammer's anki-persistence](https://github.com/SimonLammer/anki-persistence).
 Great work Simon!
 
-[Hax](https://github.com/Schlauer-Hax) merged my Multiple Choice card template with Simon Lammer's persistence code and thus made compatibility with all platforms possible.
+[Hax](https://github.com/Schlauer-Hax) merged my Multiple Choice card template with Simon Lammer's persistence code.
+He also reworked my card templates into one single all-in-one template.
 Thanks a lot!
+
+Simon's and Hax's work made the multiple choice cards compatible with all platforms.
