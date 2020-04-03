@@ -4,8 +4,9 @@ Adds multiple choice cards to Anki.
 
 ### Screenshots
 
+| Single Choice                                   | Multiple Choice                                     | Kprim                           |
+|:-----------------------------------------------:|:---------------------------------------------------:|:-------------------------------:|
 | ![Single Choice](screenshots/single_choice.png) | ![Multiple Choice](screenshots/multiple_choice.png) | ![Kprim](screenshots/kprim.png) |
-| ----------------------------------------------- | --------------------------------------------------- | ------------------------------ |
 
 ### Compatibility
 
@@ -20,6 +21,9 @@ Cards created with this add-on can be reviewed with all Computer and mobile apps
 The note type is automatically added the first time you start Anki after installing the add-on.
 
 When creating cards, write a "1" for correct choices or a "0" for incorrect choices in the "Answers" field.
+The question type can be selected with the field "QType".
+It can be either 0 (Kprim), 1 (Multiple Choice) or 2 (Single Choice).
+The [Screenshots](#screenshots) sections shows how the question types look.
 These values in the "Answer" field must be separated by a single space.
 The order and number of values in the "Answer" field must correspond with the choices "Q_1" to "Q_5".
 If you don't need all the choices, just leave the remaining "Q_" fields blank and only enter as many values as you need in the "Answers" field.
