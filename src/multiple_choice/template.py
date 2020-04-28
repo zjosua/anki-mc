@@ -296,7 +296,7 @@ card_css = """\
 .card {
  font-family: arial;
  font-size: 20px;
- text-align: left;
+ text-align: center;
  color: black;
  background-color: white;
 }
@@ -308,6 +308,11 @@ card_css = """\
 table, td, th {
  border-collapse: collapse;
  padding: 5px;
+}
+
+table {
+ display: inline-block;
+ text-align: left;
 }
 
 .correct {
