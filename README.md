@@ -53,3 +53,5 @@ He also reworked my card templates into one single all-in-one template.
 Thanks a lot!
 
 Simon's and Hax's work made the multiple choice cards compatible with all platforms.
+
+Volker Umpfenbach contributed a change that allows to customize how the questions and answers are colorized.
