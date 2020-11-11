@@ -54,28 +54,30 @@ card_front = """\
 <script>
 
     // Generate the table depending on the type.
-
     function generateTable() {
         var type = document.getElementById("Card_Type").innerHTML;
         var table = document.createElement("table");
         var tbody = document.createElement("tbody");
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; true; i++) {
             if (type == 0 && i == 0) {
                 tbody.innerHTML = tbody.innerHTML + '<tr><th>yes</th><th>no</th><th></th></tr>';
             }
+            if (document.getElementById('Q_' + (i + 1)) != undefined) {
+                if (document.getElementById('Q_' + (i + 1)).innerHTML != '') {
+                    var html = [];
 
-            if (document.getElementById('Q_' + (i + 1)).innerHTML != '') {
-                var html = [];
-
-                html.push('<tr>');
-                for (var j = 0; j < ((type == 0) ? 2 : 1); j++) {
-                    html.push(
-                        '<td onInput="onCheck()" style="text-align: center"><input name="ans_' + ((type != 2) ? (i + 1) : 'A') + '" type="' +
-                        ((type == 1) ? 'checkbox' : 'radio') + '" value="' + ((j == 0) ? 1 : 0) + '"></td>');
+                    html.push('<tr>');
+                    for (var j = 0; j < ((type == 0) ? 2 : 1); j++) {
+                        html.push(
+                            '<td onInput="onCheck()" style="text-align: center"><input name="ans_' + ((type != 2) ? (i + 1) : 'A') + '" type="' +
+                            ((type == 1) ? 'checkbox' : 'radio') + '" value="' + ((j == 0) ? 1 : 0) + '"></td>');
+                    }
+                    html.push('<td>' + document.getElementById('Q_' + (i + 1)).innerHTML + '</td>')
+                    html.push('</tr>');
+                    tbody.innerHTML = tbody.innerHTML + html.join("");
                 }
-                html.push('<td>' + document.getElementById('Q_' + (i + 1)).innerHTML + '</td>')
-                html.push('</tr>');
-                tbody.innerHTML = tbody.innerHTML + html.join("");
+            } else {
+                break;
             }
 
         }
