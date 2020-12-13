@@ -108,7 +108,7 @@ card_front = """\
 
     function onShuffle() {
         var solutions = document.getElementById("Q_solutions").innerHTML;
-        solutions = solutions.split(" ");
+        solutions = solutions.replace(/(<([^>]+)>)/gi, "").split(" ");
         for (i = 0; i < solutions.length; i++) {
             solutions[i] = Number(solutions[i]);
         }
