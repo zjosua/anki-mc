@@ -205,7 +205,7 @@ card_front = """\
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
 
-<table style="boder: 1px solid black" id="qtable"></table>
+<table style="border: 1px solid black" id="qtable"></table>
 
 <div class="hidden" id="Q_solutions">{{Answers}}</div>
 <div class="hidden" id="user_answers">- - - -</div>
