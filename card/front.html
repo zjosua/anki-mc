@@ -6,7 +6,8 @@
 </script>
 
 <script>
-    const DEFAULT_CARD_TYPE = 0; // for previewing the cards in "Manage Note Type..."
+    'use strict';
+    const DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
 
     // Generate the table depending on the type.
     function generateTable() {
@@ -77,7 +78,7 @@
     function onShuffle() {
         var solutions = document.getElementById("Q_solutions").innerHTML;
         solutions = solutions.replace(/(<([^>]+)>)/gi, "").split(" ");
-        for (i = 0; i < solutions.length; i++) {
+        for (var i = 0; i < solutions.length; i++) {
             solutions[i] = Number(solutions[i]);
         }
 
@@ -116,8 +117,8 @@
         var type = document.getElementById("Card_Type").innerHTML;
         var qrows = document.getElementById("qtable").getElementsByTagName('tbody')[0].getElementsByTagName("tr");
         document.getElementById("user_answers").innerHTML = "";
-        for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
-            var j;
+        for (var i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
+            var j;  // to skip the first row containing no checkboxes when type is 'kprim'
             if (type == 0) {
                 j = i + 1;
             } else j = i;
@@ -148,10 +149,34 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    // addCheckboxTickingShortcuts is an easy approach on using only the keyboard to toggle checkboxes in mc/sc.
+    //
+    // Naturally the number keys are an intuitive choice here. Unfortunately anki does capture those.
+    // So the workaround is to hold the (left) 'Alt' key and then type the corresponding number to toggle the row.
+    function addCheckboxTickingShortcuts() {
+        document.addEventListener('keydown', (event) => {
+            const keyName = event.key;
+
+            let tableBody = document.getElementById("qtable").getElementsByTagName('tbody')[0];
+            var tableRows = tableBody.getElementsByTagName("tr");
+
+            if (0 < +keyName < 10) {
+                let tableData = tableRows[+keyName - 1].getElementsByTagName("td")[0];
+                let tableRow = tableData.getElementsByTagName("input")[0];
+                tableRow.checked = !tableRow.checked;
+            }
+        }, false);
+    }
+
     function run() {
         if (isNaN(document.getElementById("Card_Type").innerHTML)) {
             document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
         }
+
+        if (document.getElementById("Card_Type").innerHTML != 0) {
+            addCheckboxTickingShortcuts();
+        }
+
         setTimeout(generateTable(), 1);
     }
 
@@ -189,5 +214,5 @@
 <div class="hidden" id="Q_1">{{Q_1}}</div>
 <div class="hidden" id="Q_2">{{Q_2}}</div>
 <div class="hidden" id="Q_3">{{Q_3}}</div>
-<div class="hidden" id="Q_4">{{Q_sdfsdfdsf4}}</div>
+<div class="hidden" id="Q_4">{{Q_4}}</div>
 <div class="hidden" id="Q_5">{{Q_5}}</div>

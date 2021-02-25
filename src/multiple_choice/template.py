@@ -52,6 +52,8 @@ card_front = """\
 </script>
 
 <script>
+    'use strict';
+    const DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
 
     // Generate the table depending on the type.
     function generateTable() {
@@ -66,20 +68,33 @@ card_front = """\
                 if (document.getElementById('Q_' + (i + 1)).innerHTML != '') {
                     var html = [];
 
+                    let answerText = document.getElementById('Q_' + (i + 1)).innerHTML;
+                    let labelTag = (type == 0) ? '' :
+                        '<label for="inputQuestion' + (i + 1) + '">' + answerText + '</label>';
+                    let textAlign = (type == 0) ? 'center' : 'left';
+
                     html.push('<tr>');
-                    for (var j = 0; j < ((type == 0) ? 2 : 1); j++) {
+                    var maxColumns = ((type == 0) ? 2 : 1);
+                    for (var j = 0; j < maxColumns; j++) {
+                        let inputTag = '<input id="inputQuestion' + (i + 1) +
+                            '" name="ans_' + ((type != 2) ? (i + 1) : 'A') +
+                            '" type="' + ((type == 1) ? 'checkbox' : 'radio') +
+                            // TODO: I don't see how these values are used, please add a comment
+                            '" value="' + ((j == 0) ? 1 : 0) + '">';
                         html.push(
-                            '<td onInput="onCheck()" style="text-align: center"><input name="ans_' + ((type != 2) ? (i + 1) : 'A') + '" type="' +
-                            ((type == 1) ? 'checkbox' : 'radio') + '" value="' + ((j == 0) ? 1 : 0) + '"></td>');
+                            '<td onInput="onCheck()" style="text-align: ' + textAlign + '">' + inputTag +
+                            labelTag +
+                            '</td>');
                     }
-                    html.push('<td>' + document.getElementById('Q_' + (i + 1)).innerHTML + '</td>')
+                    if (type == 0) {
+                        html.push('<td>' + answerText + '</td>');
+                    }
                     html.push('</tr>');
                     tbody.innerHTML = tbody.innerHTML + html.join("");
                 }
             } else {
                 break;
             }
-
         }
 
         table.appendChild(tbody);
@@ -109,7 +124,7 @@ card_front = """\
     function onShuffle() {
         var solutions = document.getElementById("Q_solutions").innerHTML;
         solutions = solutions.replace(/(<([^>]+)>)/gi, "").split(" ");
-        for (i = 0; i < solutions.length; i++) {
+        for (var i = 0; i < solutions.length; i++) {
             solutions[i] = Number(solutions[i]);
         }
 
@@ -123,7 +138,7 @@ card_front = """\
 
         for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
             qanda[i] = new Object();
-            qanda[i].question = qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML;
+            qanda[i].question = qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 0].innerHTML;
             qanda[i].answer = solutions[i];
         }
 
@@ -132,7 +147,7 @@ card_front = """\
         var mc_solutions = new String();
 
         for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
-            qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML = qanda[i].question;
+            qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 0].innerHTML = qanda[i].question;
             solutions[i] = qanda[i].answer;
             mc_solutions += qanda[i].answer + " ";
         }
@@ -148,8 +163,8 @@ card_front = """\
         var type = document.getElementById("Card_Type").innerHTML;
         var qrows = document.getElementById("qtable").getElementsByTagName('tbody')[0].getElementsByTagName("tr");
         document.getElementById("user_answers").innerHTML = "";
-        for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
-            var j;
+        for (var i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
+            var j;  // to skip the first row containing no checkboxes when type is 'kprim'
             if (type == 0) {
                 j = i + 1;
             } else j = i;
@@ -180,10 +195,41 @@ card_front = """\
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    // addCheckboxTickingShortcuts is an easy approach on using only the keyboard to toggle checkboxes in mc/sc.
+    //
+    // Naturally the number keys are an intuitive choice here. Unfortunately anki does capture those.
+    // So the workaround is to hold the (left) 'Alt' key and then type the corresponding number to toggle the row.
+    function addCheckboxTickingShortcuts() {
+        document.addEventListener('keydown', (event) => {
+            const keyName = event.key;
+
+            let tableBody = document.getElementById("qtable").getElementsByTagName('tbody')[0];
+            var tableRows = tableBody.getElementsByTagName("tr");
+
+            if (0 < +keyName < 10) {
+                let tableData = tableRows[+keyName - 1].getElementsByTagName("td")[0];
+                let tableRow = tableData.getElementsByTagName("input")[0];
+                tableRow.checked = !tableRow.checked;
+            }
+        }, false);
+    }
+
+    function run() {
+        if (isNaN(document.getElementById("Card_Type").innerHTML)) {
+            document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
+        }
+
+        if (document.getElementById("Card_Type").innerHTML != 0) {
+            addCheckboxTickingShortcuts();
+        }
+
+        setTimeout(generateTable(), 1);
+    }
+
     async function waitForReadyStateAndGenerateTable() {
         for (let i = 0; i < 100; i++) {
             if (document.readyState === "complete") {
-                setTimeout(generateTable(), 1);
+                run();
                 break;
             }
             await sleep(100);
@@ -196,7 +242,7 @@ card_front = """\
     license (https://creativecommons.org/licenses/by-sa/4.0/).
     */
     if (document.readyState === "complete") {
-        setTimeout(generateTable(), 1);
+        run();
     } else {
         waitForReadyStateAndGenerateTable();
     }
