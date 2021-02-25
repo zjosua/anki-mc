@@ -20,20 +20,32 @@
                 if (document.getElementById('Q_' + (i + 1)).innerHTML != '') {
                     var html = [];
 
+                    let answerText = document.getElementById('Q_' + (i + 1)).innerHTML;
+                    let labelTag = (type == 0) ? '' :
+                        '<label for="inputQuestion' + (i + 1) + '">' + answerText + '</label>';
+
                     html.push('<tr>');
-                    for (var j = 0; j < ((type == 0) ? 2 : 1); j++) {
+                    var maxColumns = ((type == 0) ? 2 : 1);
+                    for (var j = 0; j < maxColumns; j++) {
+                        let inputTag = '<input id="inputQuestion' + (i + 1) +
+                            '" name="ans_' + ((type != 2) ? (i + 1) : 'A') +
+                            '" type="' + ((type == 1) ? 'checkbox' : 'radio') +
+                            // TODO: I don't see how these values are used, please add a comment
+                            '" value="' + ((j == 0) ? 1 : 0) + '">';
                         html.push(
-                            '<td onInput="onCheck()" style="text-align: center"><input name="ans_' + ((type != 2) ? (i + 1) : 'A') + '" type="' +
-                            ((type == 1) ? 'checkbox' : 'radio') + '" value="' + ((j == 0) ? 1 : 0) + '"></td>');
+                            '<td onInput="onCheck()" style="text-align: center">' + inputTag +
+                            labelTag +
+                            '</td>');
                     }
-                    html.push('<td>' + document.getElementById('Q_' + (i + 1)).innerHTML + '</td>')
+                    if (type == 0) {
+                        html.push('<td>' + answerText + '</td>');
+                    }
                     html.push('</tr>');
                     tbody.innerHTML = tbody.innerHTML + html.join("");
                 }
             } else {
                 break;
             }
-
         }
 
         table.appendChild(tbody);
@@ -134,10 +146,17 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    function run() {
+        if (isNaN(document.getElementById("Card_Type").innerHTML)) {
+            document.getElementById("Card_Type").innerHTML = 0;
+        }
+        setTimeout(generateTable(), 1);
+    }
+
     async function waitForReadyStateAndGenerateTable() {
         for (let i = 0; i < 100; i++) {
             if (document.readyState === "complete") {
-                setTimeout(generateTable(), 1);
+                run();
                 break;
             }
             await sleep(100);
@@ -150,7 +169,7 @@
     license (https://creativecommons.org/licenses/by-sa/4.0/).
     */
     if (document.readyState === "complete") {
-        setTimeout(generateTable(), 1);
+        run();
     } else {
         waitForReadyStateAndGenerateTable();
     }
