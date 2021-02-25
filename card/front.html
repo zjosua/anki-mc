@@ -6,6 +6,7 @@
 </script>
 
 <script>
+    const DEFAULT_CARD_TYPE = 0; // for previewing the cards in "Manage Note Type..."
 
     // Generate the table depending on the type.
     function generateTable() {
@@ -23,6 +24,7 @@
                     let answerText = document.getElementById('Q_' + (i + 1)).innerHTML;
                     let labelTag = (type == 0) ? '' :
                         '<label for="inputQuestion' + (i + 1) + '">' + answerText + '</label>';
+                    let textAlign = (type == 0) ? 'center' : 'left';
 
                     html.push('<tr>');
                     var maxColumns = ((type == 0) ? 2 : 1);
@@ -33,7 +35,7 @@
                             // TODO: I don't see how these values are used, please add a comment
                             '" value="' + ((j == 0) ? 1 : 0) + '">';
                         html.push(
-                            '<td onInput="onCheck()" style="text-align: center">' + inputTag +
+                            '<td onInput="onCheck()" style="text-align: ' + textAlign + '">' + inputTag +
                             labelTag +
                             '</td>');
                     }
@@ -89,7 +91,7 @@
 
         for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
             qanda[i] = new Object();
-            qanda[i].question = qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML;
+            qanda[i].question = qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 0].innerHTML;
             qanda[i].answer = solutions[i];
         }
 
@@ -98,7 +100,7 @@
         var mc_solutions = new String();
 
         for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
-            qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML = qanda[i].question;
+            qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 0].innerHTML = qanda[i].question;
             solutions[i] = qanda[i].answer;
             mc_solutions += qanda[i].answer + " ";
         }
@@ -148,7 +150,7 @@
 
     function run() {
         if (isNaN(document.getElementById("Card_Type").innerHTML)) {
-            document.getElementById("Card_Type").innerHTML = 0;
+            document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
         }
         setTimeout(generateTable(), 1);
     }
@@ -187,5 +189,5 @@
 <div class="hidden" id="Q_1">{{Q_1}}</div>
 <div class="hidden" id="Q_2">{{Q_2}}</div>
 <div class="hidden" id="Q_3">{{Q_3}}</div>
-<div class="hidden" id="Q_4">{{Q_4}}</div>
+<div class="hidden" id="Q_4">{{Q_sdfsdfdsf4}}</div>
 <div class="hidden" id="Q_5">{{Q_5}}</div>
