@@ -206,10 +206,11 @@ card_front = """\
             let tableBody = document.getElementById("qtable").getElementsByTagName('tbody')[0];
             var tableRows = tableBody.getElementsByTagName("tr");
 
-            if (0 < +keyName < 10) {
+            if (0 < +keyName && +keyName < 10) {
                 let tableData = tableRows[+keyName - 1].getElementsByTagName("td")[0];
                 let tableRow = tableData.getElementsByTagName("input")[0];
                 tableRow.checked = !tableRow.checked;
+                onCheck();
             }
         }, false);
     }
