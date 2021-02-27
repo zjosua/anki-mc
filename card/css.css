@@ -15,6 +15,11 @@ table, td, th {
  padding: 5px;
 }
 
+table {
+ display: inline-block;
+ text-align: left;
+}
+
 .correct {
 	background-color: lime;
 }
