@@ -1,30 +1,39 @@
 .card {
- font-family: arial;
- font-size: 20px;
- text-align: center;
- color: black;
- background-color: white;
+  font-family: arial;
+  font-size: 20px;
+  text-align: center;
+  color: black;
+  background-color: white;
 }
 
 .small {
- font-size: 15px;
+  font-size: 15px;
 }
 
 table, td, th {
- border-collapse: collapse;
- padding: 5px;
+  border-collapse: collapse;
+  padding: 5px;
+}
+
+table {
+  display: inline-block;
+  text-align: left;
+}
+
+label {
+  margin-left: 0.4em;
 }
 
 .correct {
-	background-color: lime;
+  background-color: lime;
 }
 
 .nightMode .correct {
-	background-color: #009900;
+  background-color: #009900;
 }
 
 .wrong {
-	background-color: OrangeRed;
+  background-color: OrangeRed;
 }
 
 .hidden {
@@ -36,7 +45,7 @@ table, td, th {
   /* guarantees a consistent width across front and back */
   font-weight: bold;
   display: block;
-  line-height:0;
+  line-height: 0;
   height: 0;
   overflow: hidden;
   visibility: hidden;

@@ -52,6 +52,8 @@ card_front = """\
 </script>
 
 <script>
+    'use strict';
+    const DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
 
     // Generate the table depending on the type.
     function generateTable() {
@@ -66,20 +68,33 @@ card_front = """\
                 if (document.getElementById('Q_' + (i + 1)).innerHTML != '') {
                     var html = [];
 
+                    let answerText = document.getElementById('Q_' + (i + 1)).innerHTML;
+                    let labelTag = (type == 0) ? '' :
+                        '<label for="inputQuestion' + (i + 1) + '">' + answerText + '</label>';
+                    let textAlign = (type == 0) ? 'center' : 'left';
+
                     html.push('<tr>');
-                    for (var j = 0; j < ((type == 0) ? 2 : 1); j++) {
+                    var maxColumns = ((type == 0) ? 2 : 1);
+                    for (var j = 0; j < maxColumns; j++) {
+                        let inputTag = '<input id="inputQuestion' + (i + 1) +
+                            '" name="ans_' + ((type != 2) ? (i + 1) : 'A') +
+                            '" type="' + ((type == 1) ? 'checkbox' : 'radio') +
+                            // TODO: I don't see how these values are used, please add a comment
+                            '" value="' + ((j == 0) ? 1 : 0) + '">';
                         html.push(
-                            '<td onInput="onCheck()" style="text-align: center"><input name="ans_' + ((type != 2) ? (i + 1) : 'A') + '" type="' +
-                            ((type == 1) ? 'checkbox' : 'radio') + '" value="' + ((j == 0) ? 1 : 0) + '"></td>');
+                            '<td onInput="onCheck()" style="text-align: ' + textAlign + '">' + inputTag +
+                            labelTag +
+                            '</td>');
                     }
-                    html.push('<td>' + document.getElementById('Q_' + (i + 1)).innerHTML + '</td>')
+                    if (type == 0) {
+                        html.push('<td>' + answerText + '</td>');
+                    }
                     html.push('</tr>');
                     tbody.innerHTML = tbody.innerHTML + html.join("");
                 }
             } else {
                 break;
             }
-
         }
 
         table.appendChild(tbody);
@@ -109,7 +124,7 @@ card_front = """\
     function onShuffle() {
         var solutions = document.getElementById("Q_solutions").innerHTML;
         solutions = solutions.replace(/(<([^>]+)>)/gi, "").split(" ");
-        for (i = 0; i < solutions.length; i++) {
+        for (var i = 0; i < solutions.length; i++) {
             solutions[i] = Number(solutions[i]);
         }
 
@@ -123,7 +138,7 @@ card_front = """\
 
         for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
             qanda[i] = new Object();
-            qanda[i].question = qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML;
+            qanda[i].question = qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 0].innerHTML;
             qanda[i].answer = solutions[i];
         }
 
@@ -132,7 +147,7 @@ card_front = """\
         var mc_solutions = new String();
 
         for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
-            qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 1].innerHTML = qanda[i].question;
+            qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 0].innerHTML = qanda[i].question;
             solutions[i] = qanda[i].answer;
             mc_solutions += qanda[i].answer + " ";
         }
@@ -148,8 +163,8 @@ card_front = """\
         var type = document.getElementById("Card_Type").innerHTML;
         var qrows = document.getElementById("qtable").getElementsByTagName('tbody')[0].getElementsByTagName("tr");
         document.getElementById("user_answers").innerHTML = "";
-        for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
-            var j;
+        for (var i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
+            var j;  // to skip the first row containing no checkboxes when type is 'kprim'
             if (type == 0) {
                 j = i + 1;
             } else j = i;
@@ -180,10 +195,42 @@ card_front = """\
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    // addCheckboxTickingShortcuts is an easy approach on using only the keyboard to toggle checkboxes in mc/sc.
+    //
+    // Naturally the number keys are an intuitive choice here. Unfortunately anki does capture those.
+    // So the workaround is to hold the (left) 'Alt' key and then type the corresponding number to toggle the row.
+    function addCheckboxTickingShortcuts() {
+        document.addEventListener('keydown', (event) => {
+            const keyName = event.key;
+
+            let tableBody = document.getElementById("qtable").getElementsByTagName('tbody')[0];
+            var tableRows = tableBody.getElementsByTagName("tr");
+
+            if (0 < +keyName && +keyName < 10) {
+                let tableData = tableRows[+keyName - 1].getElementsByTagName("td")[0];
+                let tableRow = tableData.getElementsByTagName("input")[0];
+                tableRow.checked = !tableRow.checked;
+                onCheck();
+            }
+        }, false);
+    }
+
+    function run() {
+        if (isNaN(document.getElementById("Card_Type").innerHTML)) {
+            document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
+        }
+
+        if (document.getElementById("Card_Type").innerHTML != 0) {
+            addCheckboxTickingShortcuts();
+        }
+
+        setTimeout(generateTable(), 1);
+    }
+
     async function waitForReadyStateAndGenerateTable() {
         for (let i = 0; i < 100; i++) {
             if (document.readyState === "complete") {
-                setTimeout(generateTable(), 1);
+                run();
                 break;
             }
             await sleep(100);
@@ -196,7 +243,7 @@ card_front = """\
     license (https://creativecommons.org/licenses/by-sa/4.0/).
     */
     if (document.readyState === "complete") {
-        setTimeout(generateTable(), 1);
+        run();
     } else {
         waitForReadyStateAndGenerateTable();
     }
@@ -205,7 +252,7 @@ card_front = """\
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
 
-<table style="boder: 1px solid black" id="qtable"></table>
+<table style="border: 1px solid black" id="qtable"></table>
 
 <div class="hidden" id="Q_solutions">{{Answers}}</div>
 <div class="hidden" id="user_answers">- - - -</div>
@@ -257,14 +304,14 @@ card_back = """\
                         qrows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].checked = true;
                     }
                 } else {
-                    qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = (answers[i]==1) ? true : false;
+                    qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = (answers[i] == 1) ? true : false;
                 }
                 //Colorize the qtable.
                 if (colorizeqtable) {
                     if (solutions[i] && answers[i] === "1") {
                         qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
                     } else if (!solutions[i] && answers[i] === "0") {
-                        if (colorizefalsefalse) {qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct");}
+                        if (colorizefalsefalse) { qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct"); }
                     } else {
                         qrows[(type != 0) ? i : i + 1].setAttribute("class", "wrong");
                     }
@@ -275,10 +322,10 @@ card_back = """\
             var canswers = 0;
             for (i = 0; i < solutions.length; i++) {
                 //Rename the radio buttons of the atable to avoid interference with those in the qtable.
-                if (type==0) arows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
-                             arows[(type!=0) ? i : i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
+                if (type == 0) arows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
+                arows[(type != 0) ? i : i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
                 //Set the radio buttons in the atable.
-                if (type==0) arows[i + 1].getElementsByTagName("td")[solutions[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
+                if (type == 0) arows[i + 1].getElementsByTagName("td")[solutions[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
                 else arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
                 //Colorize the atable and count correct answers.
                 if (colorizeatable) {
@@ -286,7 +333,7 @@ card_back = """\
                         arows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
                         canswers = canswers + 1;
                     } else if (!solutions[i] && answers[i] === "0") {
-                        if(colorizefalsefalse) {arows[(type != 0) ? i : i + 1].setAttribute("class", "correct");}
+                        if (colorizefalsefalse) { arows[(type != 0) ? i : i + 1].setAttribute("class", "correct"); }
                         canswers = canswers + 1;
                     } else {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", "wrong");
@@ -294,7 +341,7 @@ card_back = """\
                 }
             }
             var canswerresult = document.getElementById('canswerresult');
-            canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers/solutions.length*100) + " %</b>";
+            canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
             Persistence.clear();
         }
     }
@@ -338,37 +385,41 @@ card_back = """\
 
 card_css = """\
 .card {
- font-family: arial;
- font-size: 20px;
- text-align: center;
- color: black;
- background-color: white;
+  font-family: arial;
+  font-size: 20px;
+  text-align: center;
+  color: black;
+  background-color: white;
 }
 
 .small {
- font-size: 15px;
+  font-size: 15px;
 }
 
 table, td, th {
- border-collapse: collapse;
- padding: 5px;
+  border-collapse: collapse;
+  padding: 5px;
 }
 
 table {
- display: inline-block;
- text-align: left;
+  display: inline-block;
+  text-align: left;
+}
+
+label {
+  margin-left: 0.4em;
 }
 
 .correct {
-	background-color: lime;
+  background-color: lime;
 }
 
 .nightMode .correct {
-	background-color: #009900;
+  background-color: #009900;
 }
 
 .wrong {
-	background-color: OrangeRed;
+  background-color: OrangeRed;
 }
 
 .hidden {
@@ -380,7 +431,7 @@ table {
   /* guarantees a consistent width across front and back */
   font-weight: bold;
   display: block;
-  line-height:0;
+  line-height: 0;
   height: 0;
   overflow: hidden;
   visibility: hidden;
