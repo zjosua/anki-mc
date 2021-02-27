@@ -62,7 +62,7 @@
 
     function onShuffle() {
         var solutions = document.getElementById("Q_solutions").innerHTML;
-        solutions = solutions.split(" ");
+        solutions = solutions.replace(/(<([^>]+)>)/gi, "").split(" ");
         for (i = 0; i < solutions.length; i++) {
             solutions[i] = Number(solutions[i]);
         }
@@ -130,18 +130,29 @@
         }
     }
 
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function waitForReadyStateAndGenerateTable() {
+        for (let i = 0; i < 100; i++) {
+            if (document.readyState === "complete") {
+                setTimeout(generateTable(), 1);
+                break;
+            }
+            await sleep(100);
+        }
+    }
+
     /*
-        The following block is from Glutanimate's Cloze Overlapper card template.
-        The Cloze Overlapper card template is licensed under the CC BY-SA 4.0
-        license (https://creativecommons.org/licenses/by-sa/4.0/).
+    The following block is inspired by Glutanimate's Cloze Overlapper card template.
+    The Cloze Overlapper card template is licensed under the CC BY-SA 4.0
+    license (https://creativecommons.org/licenses/by-sa/4.0/).
     */
     if (document.readyState === "complete") {
         setTimeout(generateTable(), 1);
-
     } else {
-        document.addEventListener("DOMContentLoaded", function () {
-            setTimeout(generateTable(), 1);
-        }, false);
+        waitForReadyStateAndGenerateTable();
     }
 </script>
 

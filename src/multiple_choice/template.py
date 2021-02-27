@@ -176,18 +176,29 @@ card_front = """\
         }
     }
 
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function waitForReadyStateAndGenerateTable() {
+        for (let i = 0; i < 100; i++) {
+            if (document.readyState === "complete") {
+                setTimeout(generateTable(), 1);
+                break;
+            }
+            await sleep(100);
+        }
+    }
+
     /*
-        The following block is from Glutanimate's Cloze Overlapper card template.
-        The Cloze Overlapper card template is licensed under the CC BY-SA 4.0
-        license (https://creativecommons.org/licenses/by-sa/4.0/).
+    The following block is inspired by Glutanimate's Cloze Overlapper card template.
+    The Cloze Overlapper card template is licensed under the CC BY-SA 4.0
+    license (https://creativecommons.org/licenses/by-sa/4.0/).
     */
     if (document.readyState === "complete") {
         setTimeout(generateTable(), 1);
-
     } else {
-        document.addEventListener("DOMContentLoaded", function () {
-            setTimeout(generateTable(), 1);
-        }, false);
+        waitForReadyStateAndGenerateTable();
     }
 </script>
 
@@ -236,7 +247,7 @@ card_back = """\
             output.innerHTML = "<hr id='answer' />" + atable.outerHTML;
             document.getElementById('qtable').innerHTML = qtable.innerHTML;
             var qrows = qtable.getElementsByTagName('tbody')[0].getElementsByTagName("tr");
-            
+
             for (i = 0; i < answers.length; i++) {
                 //Set the radio buttons in the qtable.
                 if (type == 0) {
@@ -259,7 +270,7 @@ card_back = """\
                     }
                 }
             }
-            
+
             var arows = document.getElementById("atable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
             var canswers = 0;
             for (i = 0; i < solutions.length; i++) {
@@ -287,12 +298,30 @@ card_back = """\
             Persistence.clear();
         }
     }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function waitForReadyStateAndGenerateTable() {
+        for (let i = 0; i < 100; i++) {
+            if (document.readyState === "complete") {
+                setTimeout(onLoad, 1);
+                break;
+            }
+            await sleep(100);
+        }
+    }
+
+    /*
+    The following block is inspired by Glutanimate's Cloze Overlapper card template.
+    The Cloze Overlapper card template is licensed under the CC BY-SA 4.0
+    license (https://creativecommons.org/licenses/by-sa/4.0/).
+    */
     if (document.readyState === "complete") {
         setTimeout(onLoad, 1);
     } else {
-        document.addEventListener("DOMContentLoaded", function () {
-            setTimeout(onLoad, 1);
-        }, false);
+        waitForReadyStateAndOnLoad();
     }
 </script>
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
