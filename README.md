@@ -56,3 +56,5 @@ Simon's and Hax's work made the multiple choice cards compatible with all platfo
 
 Volker Umpfenbach contributed a change that allows to customize how the questions and answers are colorized.
 He also provided the code to calculate and display the percentage of correctly answered items per question.
+
+Shoutout to [3ter](https://github.com/3ter) for his contributions that improve card initialization and checkbox handling.
