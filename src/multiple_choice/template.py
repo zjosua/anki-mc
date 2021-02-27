@@ -304,14 +304,14 @@ card_back = """\
                         qrows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].checked = true;
                     }
                 } else {
-                    qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = (answers[i]==1) ? true : false;
+                    qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = (answers[i] == 1) ? true : false;
                 }
                 //Colorize the qtable.
                 if (colorizeqtable) {
                     if (solutions[i] && answers[i] === "1") {
                         qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
                     } else if (!solutions[i] && answers[i] === "0") {
-                        if (colorizefalsefalse) {qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct");}
+                        if (colorizefalsefalse) { qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct"); }
                     } else {
                         qrows[(type != 0) ? i : i + 1].setAttribute("class", "wrong");
                     }
@@ -322,10 +322,10 @@ card_back = """\
             var canswers = 0;
             for (i = 0; i < solutions.length; i++) {
                 //Rename the radio buttons of the atable to avoid interference with those in the qtable.
-                if (type==0) arows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
-                             arows[(type!=0) ? i : i+1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
+                if (type == 0) arows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
+                arows[(type != 0) ? i : i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
                 //Set the radio buttons in the atable.
-                if (type==0) arows[i + 1].getElementsByTagName("td")[solutions[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
+                if (type == 0) arows[i + 1].getElementsByTagName("td")[solutions[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
                 else arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
                 //Colorize the atable and count correct answers.
                 if (colorizeatable) {
@@ -333,7 +333,7 @@ card_back = """\
                         arows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
                         canswers = canswers + 1;
                     } else if (!solutions[i] && answers[i] === "0") {
-                        if(colorizefalsefalse) {arows[(type != 0) ? i : i + 1].setAttribute("class", "correct");}
+                        if (colorizefalsefalse) { arows[(type != 0) ? i : i + 1].setAttribute("class", "correct"); }
                         canswers = canswers + 1;
                     } else {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", "wrong");
@@ -341,7 +341,7 @@ card_back = """\
                 }
             }
             var canswerresult = document.getElementById('canswerresult');
-            canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers/solutions.length*100) + " %</b>";
+            canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
             Persistence.clear();
         }
     }
@@ -385,37 +385,37 @@ card_back = """\
 
 card_css = """\
 .card {
- font-family: arial;
- font-size: 20px;
- text-align: center;
- color: black;
- background-color: white;
+  font-family: arial;
+  font-size: 20px;
+  text-align: center;
+  color: black;
+  background-color: white;
 }
 
 .small {
- font-size: 15px;
+  font-size: 15px;
 }
 
 table, td, th {
- border-collapse: collapse;
- padding: 5px;
+  border-collapse: collapse;
+  padding: 5px;
 }
 
 table {
- display: inline-block;
- text-align: left;
+  display: inline-block;
+  text-align: left;
 }
 
 .correct {
-	background-color: lime;
+  background-color: lime;
 }
 
 .nightMode .correct {
-	background-color: #009900;
+  background-color: #009900;
 }
 
 .wrong {
-	background-color: OrangeRed;
+  background-color: OrangeRed;
 }
 
 .hidden {
@@ -427,7 +427,7 @@ table {
   /* guarantees a consistent width across front and back */
   font-weight: bold;
   display: block;
-  line-height:0;
+  line-height: 0;
   height: 0;
   overflow: hidden;
   visibility: hidden;
