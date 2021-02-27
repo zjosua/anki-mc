@@ -406,6 +406,10 @@ table {
   text-align: left;
 }
 
+label {
+  margin-left: 0.4em;
+}
+
 .correct {
   background-color: lime;
 }
