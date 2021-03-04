@@ -361,8 +361,8 @@ table {
 aio_model = "AllInOne (kprim, mc, sc)"
 aio_card = "AllInOne (kprim, mc, sc)"
 aio_fields = {
-    "title": "Title",
     "question": "Question",
+    "title": "Title",
     "qtype": "QType (0=kprim,1=mc,2=sc)",
     "q1": "Q_1",
     "q2": "Q_2",
