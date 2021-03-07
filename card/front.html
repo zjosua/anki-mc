@@ -6,8 +6,6 @@
 </script>
 
 <script>
-    const DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
-
     // Generate the table depending on the type.
     function generateTable() {
         var type = document.getElementById("Card_Type").innerHTML;
@@ -171,6 +169,8 @@
     }
 
     function run() {
+        let DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
+
         if (isNaN(document.getElementById("Card_Type").innerHTML)) {
             document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
         }
