@@ -51,6 +51,21 @@ card_front = """\
     if (void 0 === window.Persistence) { var _persistenceKey = "github.com/SimonLammer/anki-persistence/", _defaultKey = "_default"; if (window.Persistence_sessionStorage = function () { var e = !1; try { "object" == typeof window.sessionStorage && (e = !0, this.clear = function () { for (var e = 0; e < sessionStorage.length; e++) { var t = sessionStorage.key(e); 0 == t.indexOf(_persistenceKey) && (sessionStorage.removeItem(t), e--) } }, this.setItem = function (e, t) { void 0 == t && (t = e, e = _defaultKey), sessionStorage.setItem(_persistenceKey + e, JSON.stringify(t)) }, this.getItem = function (e) { return void 0 == e && (e = _defaultKey), JSON.parse(sessionStorage.getItem(_persistenceKey + e)) }, this.removeItem = function (e) { void 0 == e && (e = _defaultKey), sessionStorage.removeItem(_persistenceKey + e) }) } catch (e) { } this.isAvailable = function () { return e } }, window.Persistence_windowKey = function (e) { var t = window[e], i = !1; "object" == typeof t && (i = !0, this.clear = function () { t[_persistenceKey] = {} }, this.setItem = function (e, i) { void 0 == i && (i = e, e = _defaultKey), t[_persistenceKey][e] = i }, this.getItem = function (e) { return void 0 == e && (e = _defaultKey), t[_persistenceKey][e] || null }, this.removeItem = function (e) { void 0 == e && (e = _defaultKey), delete t[_persistenceKey][e] }, void 0 == t[_persistenceKey] && this.clear()), this.isAvailable = function () { return i } }, window.Persistence = new Persistence_sessionStorage, Persistence.isAvailable() || (window.Persistence = new Persistence_windowKey("py")), !Persistence.isAvailable()) { var titleStartIndex = window.location.toString().indexOf("title"), titleContentIndex = window.location.toString().indexOf("main", titleStartIndex); titleStartIndex > 0 && titleContentIndex > 0 && titleContentIndex - titleStartIndex < 10 && (window.Persistence = new Persistence_windowKey("qt")) } }
 </script>
 
+{{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
+{{#Question}}<p>{{Question}}</p>{{/Question}}
+
+<table style="border: 1px solid black" id="qtable"></table>
+
+<div class="hidden" id="Q_solutions">{{Answers}}</div>
+<div class="hidden" id="user_answers">- - - -</div>
+<div class="hidden" id="Card_Type">{{QType (0=kprim,1=mc,2=sc)}}</div>
+
+<div class="hidden" id="Q_1">{{Q_1}}</div>
+<div class="hidden" id="Q_2">{{Q_2}}</div>
+<div class="hidden" id="Q_3">{{Q_3}}</div>
+<div class="hidden" id="Q_4">{{Q_4}}</div>
+<div class="hidden" id="Q_5">{{Q_5}}</div>
+
 <script>
     // Generate the table depending on the type.
     function generateTable() {
@@ -214,6 +229,14 @@ card_front = """\
         document.addEventListener('keydown', tickCheckboxOnNumberKeyDown, false);
     }
 
+    function isMobile() {
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     function run() {
         let DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
 
@@ -221,20 +244,20 @@ card_front = """\
             document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
         }
 
-        if (document.getElementById("Card_Type").innerHTML != 0) {
+        if (document.getElementById("Card_Type").innerHTML != 0 && !isMobile()) {
             addCheckboxTickingShortcuts();
         }
 
         setTimeout(generateTable(), 1);
     }
 
-    async function waitForReadyStateAndGenerateTable() {
+    async function waitForReadyStateAndRun() {
         for (let i = 0; i < 100; i++) {
             if (document.readyState === "complete") {
                 run();
                 break;
             }
-            console.log("Document not yet fully loaded, retry in 0.1s.");
+            console.log("Document not yet fully loaded (readyState: " + document.readyState + "). Retry in 0.1s.");
             await sleep(100);
         }
     }
@@ -247,24 +270,9 @@ card_front = """\
     if (document.readyState === "complete") {
         run();
     } else {
-        waitForReadyStateAndGenerateTable();
+        waitForReadyStateAndRun();
     }
-</script>
-
-{{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
-{{#Question}}<p>{{Question}}</p>{{/Question}}
-
-<table style="border: 1px solid black" id="qtable"></table>
-
-<div class="hidden" id="Q_solutions">{{Answers}}</div>
-<div class="hidden" id="user_answers">- - - -</div>
-<div class="hidden" id="Card_Type">{{QType (0=kprim,1=mc,2=sc)}}</div>
-
-<div class="hidden" id="Q_1">{{Q_1}}</div>
-<div class="hidden" id="Q_2">{{Q_2}}</div>
-<div class="hidden" id="Q_3">{{Q_3}}</div>
-<div class="hidden" id="Q_4">{{Q_4}}</div>
-<div class="hidden" id="Q_5">{{Q_5}}</div>\
+</script>\
 """
 
 card_back = """\
@@ -274,16 +282,31 @@ card_back = """\
     // v0.5.2 - https://github.com/SimonLammer/anki-persistence/blob/62463a7f63e79ce12f7a622a8ca0beb4c1c5d556/script.js
     if (void 0 === window.Persistence) { var _persistenceKey = "github.com/SimonLammer/anki-persistence/", _defaultKey = "_default"; if (window.Persistence_sessionStorage = function () { var e = !1; try { "object" == typeof window.sessionStorage && (e = !0, this.clear = function () { for (var e = 0; e < sessionStorage.length; e++) { var t = sessionStorage.key(e); 0 == t.indexOf(_persistenceKey) && (sessionStorage.removeItem(t), e--) } }, this.setItem = function (e, t) { void 0 == t && (t = e, e = _defaultKey), sessionStorage.setItem(_persistenceKey + e, JSON.stringify(t)) }, this.getItem = function (e) { return void 0 == e && (e = _defaultKey), JSON.parse(sessionStorage.getItem(_persistenceKey + e)) }, this.removeItem = function (e) { void 0 == e && (e = _defaultKey), sessionStorage.removeItem(_persistenceKey + e) }) } catch (e) { } this.isAvailable = function () { return e } }, window.Persistence_windowKey = function (e) { var t = window[e], i = !1; "object" == typeof t && (i = !0, this.clear = function () { t[_persistenceKey] = {} }, this.setItem = function (e, i) { void 0 == i && (i = e, e = _defaultKey), t[_persistenceKey][e] = i }, this.getItem = function (e) { return void 0 == e && (e = _defaultKey), t[_persistenceKey][e] || null }, this.removeItem = function (e) { void 0 == e && (e = _defaultKey), delete t[_persistenceKey][e] }, void 0 == t[_persistenceKey] && this.clear()), this.isAvailable = function () { return i } }, window.Persistence = new Persistence_sessionStorage, Persistence.isAvailable() || (window.Persistence = new Persistence_windowKey("py")), !Persistence.isAvailable()) { var titleStartIndex = window.location.toString().indexOf("title"), titleContentIndex = window.location.toString().indexOf("main", titleStartIndex); titleStartIndex > 0 && titleContentIndex > 0 && titleContentIndex - titleStartIndex < 10 && (window.Persistence = new Persistence_windowKey("qt")) } }
 </script>
+
+{{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
+{{#Question}}<p>{{Question}}</p>{{/Question}}
+<table id="qtable"></table>
+<p id="output"></p>
+<div class="hidden" id="MC_solutions">solutions_here</div>
+<div class="hidden" id="user_answers">user_answers_here</div>
+<div class="hidden" id="CardType">{{QType (0=kprim,1=mc,2=sc)}}</div>
+<p id="canswerresult"><b>Correct answers: x %</b></p>
+{{#Sources}}<p class="small" id="sources"><b>Sources:</b><br />{{Sources}}</p>{{/Sources}}
+{{#Extra 1}}<p class="small" id="extra1"><b>Extra 1:</b><br />{{Extra 1}}</p>{{/Extra 1}}
+
 <script>
+    "use strict";
+
     function onLoad() {
         var colorizeqtable = false;
         var colorizeatable = true;
         var colorizefalsefalse = true;
         // Check if Persistence is recognized to prevent errors when viewing note in "Manage Note Types..."
-        if (Persistence.isAvailable && Persistence.getItem) {
+        if (Persistence.isAvailable && Persistence.getItem('Q_solutions') !== null) {
             // Parsing solutions
-            solutions = Persistence.getItem('Q_solutions').split(" ");
-            for (i = 0; i < solutions.length; i++) {
+            console.log(Persistence.getItem('Q_solutions'));
+            var solutions = Persistence.getItem('Q_solutions').split(" ");
+            for (let i = 0; i < solutions.length; i++) {
                 solutions[i] = Number(solutions[i]);
             }
             var answers = Persistence.getItem('user_answers').split(" ");
@@ -297,7 +320,7 @@ card_back = """\
             document.getElementById('qtable').innerHTML = qtable.innerHTML;
             var qrows = qtable.getElementsByTagName('tbody')[0].getElementsByTagName("tr");
 
-            for (i = 0; i < answers.length; i++) {
+            for (let i = 0; i < answers.length; i++) {
                 //Set the radio buttons in the qtable.
                 if (type == 0) {
                     if (answers[i] === "1") {
@@ -322,7 +345,7 @@ card_back = """\
 
             var arows = document.getElementById("atable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
             var canswers = 0;
-            for (i = 0; i < solutions.length; i++) {
+            for (let i = 0; i < solutions.length; i++) {
                 //Rename the radio buttons of the atable to avoid interference with those in the qtable.
                 if (type == 0) arows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
                 arows[(type != 0) ? i : i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
@@ -348,29 +371,52 @@ card_back = """\
         }
     }
 
-    function run() {
-        if (document.readyState === "complete") {
-            // To make sure there isn't a previously registered event handler lingering into the next review
-            document.removeEventListener('keydown', tickCheckboxOnNumberKeyDown, false);
-            setTimeout(onLoad(), 1);
+    function isMobile() {
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            return true;
         } else {
-            console.log("Document not yet fully loaded, retry in 0.3s.");
-            setTimeout(run(), 300);
+            return false;
         }
     }
 
-    run();
-</script>
-{{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
-{{#Question}}<p>{{Question}}</p>{{/Question}}
-<table id="qtable"></table>
-<p id="output"></p>
-<div class="hidden" id="MC_solutions">solutions_here</div>
-<div class="hidden" id="user_answers">user_answers_here</div>
-<div class="hidden" id="CardType">{{QType (0=kprim,1=mc,2=sc)}}</div>
-<p id="canswerresult"><b>Correct answers: x %</b></p>
-{{#Sources}}<p class="small" id="sources"><b>Sources:</b><br />{{Sources}}</p>{{/Sources}}
-{{#Extra 1}}<p class="small" id="extra1"><b>Extra 1:</b><br />{{Extra 1}}</p>{{/Extra 1}}\
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function run() {
+        if (!isMobile() && typeof tickCheckboxOnNumberKeyDown !== "undefined") {
+            // To make sure there isn't a previously registered event handler lingering into the next review
+            document.removeEventListener('keydown', tickCheckboxOnNumberKeyDown, false);
+        }
+        setTimeout(onLoad(), 1);
+    }
+
+    async function waitForReadyStateAndRun() {
+        for (let i = 0; i < 100; i++) {
+            if (document.readyState === "complete") {
+                run();
+                break;
+            }
+            console.log("Document not yet fully loaded (readyState: " + document.readyState + "). Retry in 0.1s.");
+            await sleep(100);
+        }
+    }
+
+    /*
+    The following block is inspired by Glutanimate's Cloze Overlapper card template.
+    The Cloze Overlapper card template is licensed under the CC BY-SA 4.0
+    license (https://creativecommons.org/licenses/by-sa/4.0/).
+    */
+    if (document.readyState === "complete") {
+        run();
+    } else if (isMobile()) {
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(onLoad, 1);
+        }, false);
+    } else {
+        waitForReadyStateAndRun();
+    }
+</script>\
 """
 
 card_css = """\
