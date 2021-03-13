@@ -1,6 +1,6 @@
 # Multiple Choice for Anki
 #
-# Copyright (C) 2018-2020  zjosua <https://github.com/zjosua>
+# Copyright (C) 2018-2021  zjosua <https://github.com/zjosua>
 #
 # This file is based on __init__.py from Glutanimate's
 # Cloze Overlapper Add-on for Anki

@@ -37,7 +37,7 @@ The add-on will automatically style your choices based on whether you answered c
 
 ### License and Credits
 
-*Multiple Choice for Anki* is *Copyright © 2020 [zjosua](https://github.com/zjosua)*
+*Multiple Choice for Anki* is *Copyright © 2021 [zjosua](https://github.com/zjosua)*
 
 It is licensed under the AGPLv3.
 For more information refer to the [LICENSE](https://github.com/zjosua/anki-mc/blob/master/LICENSE) file.
