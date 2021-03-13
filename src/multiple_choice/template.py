@@ -52,9 +52,6 @@ card_front = """\
 </script>
 
 <script>
-    'use strict';
-    const DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
-
     // Generate the table depending on the type.
     function generateTable() {
         var type = document.getElementById("Card_Type").innerHTML;
@@ -195,27 +192,31 @@ card_front = """\
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    function tickCheckboxOnNumberKeyDown(event) {
+        const keyName = event.key;
+
+        let tableBody = document.getElementById("qtable").getElementsByTagName('tbody')[0];
+        var tableRows = tableBody.getElementsByTagName("tr");
+
+        if (0 < +keyName && +keyName < 10) {
+            let tableData = tableRows[+keyName - 1].getElementsByTagName("td")[0];
+            let tableRow = tableData.getElementsByTagName("input")[0];
+            tableRow.checked = !tableRow.checked;
+            onCheck();
+        }
+    }
+
     // addCheckboxTickingShortcuts is an easy approach on using only the keyboard to toggle checkboxes in mc/sc.
     //
     // Naturally the number keys are an intuitive choice here. Unfortunately anki does capture those.
     // So the workaround is to hold the (left) 'Alt' key and then type the corresponding number to toggle the row.
     function addCheckboxTickingShortcuts() {
-        document.addEventListener('keydown', (event) => {
-            const keyName = event.key;
-
-            let tableBody = document.getElementById("qtable").getElementsByTagName('tbody')[0];
-            var tableRows = tableBody.getElementsByTagName("tr");
-
-            if (0 < +keyName && +keyName < 10) {
-                let tableData = tableRows[+keyName - 1].getElementsByTagName("td")[0];
-                let tableRow = tableData.getElementsByTagName("input")[0];
-                tableRow.checked = !tableRow.checked;
-                onCheck();
-            }
-        }, false);
+        document.addEventListener('keydown', tickCheckboxOnNumberKeyDown, false);
     }
 
     function run() {
+        let DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
+
         if (isNaN(document.getElementById("Card_Type").innerHTML)) {
             document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
         }
@@ -233,6 +234,7 @@ card_front = """\
                 run();
                 break;
             }
+            console.log("Document not yet fully loaded, retry in 0.1s.");
             await sleep(100);
         }
     }
@@ -277,8 +279,8 @@ card_back = """\
         var colorizeqtable = false;
         var colorizeatable = true;
         var colorizefalsefalse = true;
-        // Check if Persistence is Available
-        if (Persistence.isAvailable) {
+        // Check if Persistence is recognized to prevent errors when viewing note in "Manage Note Types..."
+        if (Persistence.isAvailable && Persistence.getItem) {
             // Parsing solutions
             solutions = Persistence.getItem('Q_solutions').split(" ");
             for (i = 0; i < solutions.length; i++) {
@@ -346,30 +348,18 @@ card_back = """\
         }
     }
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    async function waitForReadyStateAndGenerateTable() {
-        for (let i = 0; i < 100; i++) {
-            if (document.readyState === "complete") {
-                setTimeout(onLoad, 1);
-                break;
-            }
-            await sleep(100);
+    function run() {
+        if (document.readyState === "complete") {
+            // To make sure there isn't a previously registered event handler lingering into the next review
+            document.removeEventListener('keydown', tickCheckboxOnNumberKeyDown, false);
+            setTimeout(onLoad(), 1);
+        } else {
+            console.log("Document not yet fully loaded, retry in 0.3s.");
+            setTimeout(run(), 300);
         }
     }
 
-    /*
-    The following block is inspired by Glutanimate's Cloze Overlapper card template.
-    The Cloze Overlapper card template is licensed under the CC BY-SA 4.0
-    license (https://creativecommons.org/licenses/by-sa/4.0/).
-    */
-    if (document.readyState === "complete") {
-        setTimeout(onLoad, 1);
-    } else {
-        waitForReadyStateAndOnLoad();
-    }
+    run();
 </script>
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}

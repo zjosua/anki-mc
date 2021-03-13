@@ -6,9 +6,6 @@
 </script>
 
 <script>
-    'use strict';
-    const DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
-
     // Generate the table depending on the type.
     function generateTable() {
         var type = document.getElementById("Card_Type").innerHTML;
@@ -149,27 +146,31 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    function tickCheckboxOnNumberKeyDown(event) {
+        const keyName = event.key;
+
+        let tableBody = document.getElementById("qtable").getElementsByTagName('tbody')[0];
+        var tableRows = tableBody.getElementsByTagName("tr");
+
+        if (0 < +keyName && +keyName < 10) {
+            let tableData = tableRows[+keyName - 1].getElementsByTagName("td")[0];
+            let tableRow = tableData.getElementsByTagName("input")[0];
+            tableRow.checked = !tableRow.checked;
+            onCheck();
+        }
+    }
+
     // addCheckboxTickingShortcuts is an easy approach on using only the keyboard to toggle checkboxes in mc/sc.
     //
     // Naturally the number keys are an intuitive choice here. Unfortunately anki does capture those.
     // So the workaround is to hold the (left) 'Alt' key and then type the corresponding number to toggle the row.
     function addCheckboxTickingShortcuts() {
-        document.addEventListener('keydown', (event) => {
-            const keyName = event.key;
-
-            let tableBody = document.getElementById("qtable").getElementsByTagName('tbody')[0];
-            var tableRows = tableBody.getElementsByTagName("tr");
-
-            if (0 < +keyName && +keyName < 10) {
-                let tableData = tableRows[+keyName - 1].getElementsByTagName("td")[0];
-                let tableRow = tableData.getElementsByTagName("input")[0];
-                tableRow.checked = !tableRow.checked;
-                onCheck();
-            }
-        }, false);
+        document.addEventListener('keydown', tickCheckboxOnNumberKeyDown, false);
     }
 
     function run() {
+        let DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
+
         if (isNaN(document.getElementById("Card_Type").innerHTML)) {
             document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
         }
@@ -187,6 +188,7 @@
                 run();
                 break;
             }
+            console.log("Document not yet fully loaded, retry in 0.1s.");
             await sleep(100);
         }
     }
