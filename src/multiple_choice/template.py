@@ -511,16 +511,11 @@ def addModel(col):
 
 def updateTemplate(col):
     """Update add-on card templates"""
-    print("Updating %s card template".format(kprim_model))
-    model = col.models.byName(kprim_model)
+    print("Updating %s card template".format(aio_model))
+    model = col.models.byName(aio_model)
     template = model['tmpls'][0]
     template['qfmt'] = card_front
     template['afmt'] = card_back
     model['css'] = card_css
     col.models.save()
     return model
-
-def initializeModel():
-    model = mw.col.models.byName(aio_model)
-    if not model:
-        model = addModel(mw.col)

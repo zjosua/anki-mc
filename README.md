@@ -42,7 +42,7 @@ The add-on will automatically style your choices based on whether you answered c
 It is licensed under the AGPLv3.
 For more information refer to the [LICENSE](https://github.com/zjosua/anki-mc/blob/master/LICENSE) file.
 
-The files `__init__.py` and the template file are based on the Anki add-on [Cloze Overlapper](https://github.com/glutanimate/cloze-overlapper) by Glutanimate.
+A bunch of code in this add-on is based on the Anki add-ons [Image Occlusion Enhanced](https://github.com/glutanimate/image-occlusion-enhanced) and [Cloze Overlapper](https://github.com/glutanimate/cloze-overlapper) by Glutanimate.
 [Click here to support Glutanimate's work](https://glutanimate.com/support-my-work/).
 
 Persistence is achieved using the code from [Simon Lammer's anki-persistence](https://github.com/SimonLammer/anki-persistence).

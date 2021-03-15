@@ -34,10 +34,26 @@
 
 from aqt import gui_hooks, mw
 
-from .template import initializeModel
+from .config import *
+from . import template
+
+
+def getOrCreateModel():
+    model = mw.col.models.byName(template.aio_model)
+    if not model:
+        # create model
+        model = template.addModel(mw.col)
+        return model
+    model_version = mw.col.get_config('mc_conf')['version']
+    if LooseVersion(model_version) < LooseVersion(default_conf_syncd['version']):
+        return template.updateTemplate(mw.col)
+    return model
 
 def delayedInit():
-    initializeModel()
+    """Setup add-on config and templates, update if necessary"""
+    getSyncedConfig()
+    getLocalConfig()
+    getOrCreateModel()
 
 gui_hooks.profile_did_open.append(delayedInit)
 
