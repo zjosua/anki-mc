@@ -477,8 +477,8 @@ label {
 aio_model = "AllInOne (kprim, mc, sc)"
 aio_card = "AllInOne (kprim, mc, sc)"
 aio_fields = {
-    "title": "Title",
     "question": "Question",
+    "title": "Title",
     "qtype": "QType (0=kprim,1=mc,2=sc)",
     "q1": "Q_1",
     "q2": "Q_2",
@@ -504,7 +504,7 @@ def addModel(col):
     template['qfmt'] = card_front
     template['afmt'] = card_back
     model['css'] = card_css
-    model['sortf'] = 1 # set sortfield to question
+    model['sortf'] = 0 # set sortfield to question
     models.addTemplate(model, template)
     models.add(model)
     return model
