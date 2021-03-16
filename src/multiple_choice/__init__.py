@@ -35,18 +35,18 @@
 from aqt import gui_hooks, mw
 
 from .config import *
-from . import template
-
+from .packaging.packaging import version
+from .template import *
 
 def getOrCreateModel():
-    model = mw.col.models.byName(template.aio_model)
+    model = mw.col.models.byName(aio_model)
     if not model:
         # create model
-        model = template.addModel(mw.col)
+        model = addModel(mw.col)
         return model
     model_version = mw.col.get_config('mc_conf')['version']
-    if LooseVersion(model_version) < LooseVersion(default_conf_syncd['version']):
-        return template.updateTemplate(mw.col)
+    if version.parse(model_version) < version.parse(default_conf_syncd['version']):
+        return updateTemplate(mw.col)
     return model
 
 def delayedInit():
@@ -54,6 +54,10 @@ def delayedInit():
     getSyncedConfig()
     getLocalConfig()
     getOrCreateModel()
+    if version.parse(mw.col.get_config("mc_conf")['version']) < version.parse(default_conf_syncd['version']):
+        updateSyncedConfig()
+    if version.parse(mw.pm.profile['mc_conf'].get('version', 0)) < version.parse(default_conf_syncd['version']):
+        updateLocalConfig()
 
 gui_hooks.profile_did_open.append(delayedInit)
 

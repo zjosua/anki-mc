@@ -38,15 +38,15 @@ Sets up configuration
 """
 
 # Compare semantic version: https://stackoverflow.com/a/11887885
-from distutils.version import LooseVersion
 
 from aqt import mw
+
+from .packaging.packaging import version
 
 # default configurations
 # TODO: update version number before release
 default_conf_local = {'version': "2.4.0"}
 default_conf_syncd = {'version': "2.4.0"}
-
 
 def getSyncedConfig():
     # Synced preferences
@@ -55,27 +55,27 @@ def getSyncedConfig():
         mw.col.set_config("mc_conf", default_conf_syncd)
         mw.col.setMod()
 
-    elif LooseVersion(mw.col.get_config("mc_conf")['version']) < LooseVersion(default_conf_syncd['version']):
-        print("Updating config DB from earlier IO release")
-        tmp_conf = mw.col.get_config("mc_conf")
-        for key in list(default_conf_syncd.keys()):
-            if key not in mw.col.get_config("mc_conf"):
-                tmp_conf[key] = default_conf_syncd[key]
-        tmp_conf['version'] = default_conf_syncd['version']
-        mw.col.set_config("mc_conf", tmp_conf)
-        mw.col.setMod()
-
     return mw.col.get_config("mc_conf")
 
+def updateSyncedConfig():
+    print("Updating config DB from earlier MC release")
+    tmp_conf = mw.col.get_config("mc_conf")
+    for key in list(default_conf_syncd.keys()):
+        if key not in mw.col.get_config("mc_conf"):
+            tmp_conf[key] = default_conf_syncd[key]
+    tmp_conf['version'] = default_conf_syncd['version']
+    mw.col.set_config("mc_conf", tmp_conf)
+    mw.col.setMod()
 
 def getLocalConfig():
     # Local preferences
     if 'mc_conf' not in mw.pm.profile:
         mw.pm.profile["mc_conf"] = default_conf_local
-    elif LooseVersion(mw.pm.profile['mc_conf'].get('version', 0)) < LooseVersion(default_conf_syncd['version']):
-        for key in list(default_conf_local.keys()):
-            if key not in mw.col.get_config("mc_conf"):
-                mw.pm.profile["mc_conf"][key] = default_conf_local[key]
-        mw.pm.profile['mc_conf']['version'] = default_conf_local['version']
 
     return mw.pm.profile["mc_conf"]
+
+def updateLocalConfig():
+    for key in list(default_conf_local.keys()):
+        if key not in mw.col.get_config("mc_conf"):
+            mw.pm.profile["mc_conf"][key] = default_conf_local[key]
+    mw.pm.profile['mc_conf']['version'] = default_conf_local['version']
