@@ -510,8 +510,8 @@ def addModel(col):
     return model
 
 def updateTemplate(col):
-    """Update add-on card templates"""
-    print("Updating %s card template".format(aio_model))
+    """Update add-on note templates"""
+    print(f"Updating {aio_model} note template")
     model = col.models.byName(aio_model)
     template = model['tmpls'][0]
     template['qfmt'] = card_front
