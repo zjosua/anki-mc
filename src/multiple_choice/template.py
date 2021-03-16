@@ -517,5 +517,5 @@ def updateTemplate(col):
     template['qfmt'] = card_front
     template['afmt'] = card_back
     model['css'] = card_css
-    col.models.save()
+    col.models.save(model)
     return model
