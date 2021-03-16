@@ -37,10 +37,9 @@
 Sets up configuration
 """
 
-# Compare semantic version: https://stackoverflow.com/a/11887885
-
 from aqt import mw
 
+# Compare semantic version: https://stackoverflow.com/a/11887885
 from .packaging.packaging import version
 
 # default configurations
