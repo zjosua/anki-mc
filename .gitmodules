@@ -1,0 +1,3 @@
+[submodule "src/multiple_choice/packaging"]
+	path = src/multiple_choice/packaging
+	url = https://github.com/pypa/packaging
