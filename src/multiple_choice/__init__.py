@@ -35,7 +35,7 @@
 from aqt import gui_hooks, mw
 
 from .config import *
-from .packaging.packaging import version
+from .packaging import version
 from .template import *
 
 def getOrCreateModel():

@@ -40,12 +40,12 @@ Sets up configuration
 from aqt import mw
 
 # Compare semantic version: https://stackoverflow.com/a/11887885
-from .packaging.packaging import version
+from .packaging import version
 
 # default configurations
 # TODO: update version number before release
-default_conf_local = {'version': "2.4.0"}
-default_conf_syncd = {'version': "2.4.0"}
+default_conf_local = {'version': "2.4.1"}
+default_conf_syncd = {'version': "2.4.1"}
 
 def getSyncedConfig():
     # Synced preferences

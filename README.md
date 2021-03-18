@@ -58,3 +58,5 @@ Volker Umpfenbach contributed a change that allows to customize how the question
 He also provided the code to calculate and display the percentage of correctly answered items per question.
 
 Shoutout to [3ter](https://github.com/3ter) for his contributions that improve card initialization and checkbox handling.
+
+This add-on uses the [packaging](https://packaging.pypa.io/en/latest/) library.
