@@ -11,7 +11,6 @@
 <table style="border: 1px solid black" id="qtable"></table>
 
 <div class="hidden" id="Q_solutions">{{Answers}}</div>
-<div class="hidden" id="user_answers">- - - -</div>
 <div class="hidden" id="Card_Type">{{QType (0=kprim,1=mc,2=sc)}}</div>
 
 <div class="hidden" id="Q_1">{{Q_1}}</div>
@@ -124,34 +123,46 @@
         onCheck();
     }
 
-    function onCheck() {
-        // Generate user_answers
-        var type = document.getElementById("Card_Type").innerHTML;
-        var qrows = document.getElementById("qtable").getElementsByTagName('tbody')[0].getElementsByTagName("tr");
-        document.getElementById("user_answers").innerHTML = "";
-        for (var i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
-            var j;  // to skip the first row containing no checkboxes when type is 'kprim'
-            if (type == 0) {
-                j = i + 1;
-            } else j = i;
-            if (qrows[j].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked) {
+    /**
+     * Returns true if the option box/circle is checked.
+     *
+     * In case of kprim the second box is used as reference.
+     *
+     * @param   {HTMLTableRowElement}    optionRow    Row containing option boxes/circles.
+     * @param   {number}    index   Index of the option in question.
+     */
+    function isOptionChecked(optionRow, index) {
+        return optionRow.getElementsByTagName("td")[index].getElementsByTagName("input")[0].checked
+    }
 
-                document.getElementById("user_answers").innerHTML += "1 ";
-            } else if (type != 0 && !qrows[j].getElementsByTagName("td")[(type == 0) ? 1 : 0].getElementsByTagName("input")[0].checked) {
-                document.getElementById("user_answers").innerHTML += "0 ";
-            } else if (type == 0 && qrows[j].getElementsByTagName("td")[(type == 0) ? 1 : 0].getElementsByTagName("input")[0].checked) {
-                document.getElementById("user_answers").innerHTML += "0 ";
+    function getUserAnswers() {
+        let type = document.getElementById("Card_Type").innerHTML;
+        let qrows = document.getElementById("qtable").getElementsByTagName('tbody')[0].getElementsByTagName("tr");
+        let userAnswers = "";
+        for (let i = 0; i < qrows.length; i++) {
+            if (type == 0 && i == 0) {
+                i++; // to skip the first row containing no checkboxes when type is 'kprim'
+            }
+            if (isOptionChecked(qrows[i], 0)) {
+                userAnswers += "1 ";
             } else {
-                document.getElementById("user_answers").innerHTML += "- ";
+                userAnswers += "0 ";
             }
         }
+        return userAnswers.trim();  // Remove trailing space
+    }
 
-        document.getElementById("user_answers").innerHTML = document.getElementById("user_answers").innerHTML.trim();
-
-        // Send Stuff to Persistence
+    /**
+     * On checking an option this collects and stores answers in between front/back of the card.
+     *
+     * In case of kprim only the first box is looked at, if it isn't checked the second box has to be.
+     * By default a '1' in the answers stands for 'yes' which is the first option from the left.
+     */
+    function onCheck() {
+        // Send question table and encoded answers to Persistence along with the provided solutions
         if (Persistence.isAvailable()) {
             Persistence.clear();
-            Persistence.setItem('user_answers', document.getElementById("user_answers").innerHTML);
+            Persistence.setItem('user_answers', getUserAnswers());
             Persistence.setItem('Q_solutions', document.getElementById("Q_solutions").innerHTML);
             Persistence.setItem('qtable', document.getElementById("qtable").innerHTML);
         }
