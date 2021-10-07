@@ -332,15 +332,13 @@ card_back = """\
                     qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = (answers[i] == 1) ? true : false;
                 }
                 //Colorize the qtable.
-                if (colorizeqtable) {
-                    if (solutions[i] && answers[i] === "1") {
-                        qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
-                    } else if (!solutions[i] && answers[i] === "0") {
-                        if (colorizefalsefalse) { qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct"); }
-                    } else {
-                        qrows[(type != 0) ? i : i + 1].setAttribute("class", "wrong");
-                    }
-                }
+                if (solutions[i] && answers[i] === "1") {
+			qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
+		} else if (solutions[i] && answers[i] === "0") {
+			qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
+		} else if (!solutions[i] && answers[i] === "1") {
+			qrows[(type != 0) ? i : i + 1].setAttribute("class", "wrong");
+		}
             }
 
             var arows = document.getElementById("atable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
