@@ -500,11 +500,25 @@ aio_fields = {
     "q5": "Q_5",
     "answers": "Answers",
     "sources": "Sources",
-    "extra": "Extra 1"
+    "extra": "Extra 1",
+    "fake1": "FAKE_1",
+    "fake2": "FAKE_2",
+    "fake3": "FAKE_3",
+    "fake4": "FAKE_4",
 }
 
 def addModel(col):
+    def trans(string):
+        for k,v in translation.items():
+            print(  k,v )
+            string=string.replace('{{%s}}' % (k,) ,'{{%s}}' % (v,) )
+        return string
+
     """Add add-on note type to collection"""
+    translation = { 'Q_1': 'TTTT','Question':'Q_1','TTTT': 'Question'}
+    for i in range(2,6):
+        translation['Q_'+str(i)] =  'FAKE_'+str(i-1)
+
     models = col.models
     model = models.new(aio_model)
     model['type'] = MODEL_STD
@@ -512,13 +526,15 @@ def addModel(col):
     for i in aio_fields.keys():
         fld = models.newField(aio_fields[i])
         models.addField(model, fld)
+
     # Add template
-    template = models.newTemplate(aio_card)
-    template['qfmt'] = card_front
-    template['afmt'] = card_back
-    model['css'] = card_css
-    model['sortf'] = 0 # set sortfield to question
-    models.addTemplate(model, template)
+    for z in range(2):
+        template = models.newTemplate(aio_card)
+        template['qfmt'] = card_front if z==0 else trans(card_front)
+        template['afmt'] = card_back  if z==0 else trans(card_back)
+        model['css'] = card_css
+        model['sortf'] = 0 # set sortfield to question
+        models.addTemplate(model, template)
     models.add(model)
     return model
 
