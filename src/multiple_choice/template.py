@@ -360,13 +360,13 @@ card_back = """\
                 else arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
                 //Colorize the atable and count correct answers.
                 if (colorizeatable) {
-                    if ((type==2)&& (solutions[i]== "0"))
+                    if ((type==2)&& (solutions[i]== "0" && answers[i]== "0"))
                     {
                         continue;
                     }
-                    if (solutions[i] && answers[i] === "1") {
+                    if ((solutions[i]=="1") && (answers[i]=="1" || (type==2)) ) {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
-                        canswers = canswers + 1;
+                        canswers = canswers + (answers[i]=="1");
                     } else if (!solutions[i] && answers[i] === "0") {
                         if (colorizefalsefalse) { arows[(type != 0) ? i : i + 1].setAttribute("class", "correct"); }
                         canswers = canswers + 1;
