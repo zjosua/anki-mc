@@ -7,13 +7,13 @@
 
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
+
 <table id="qtable"></table>
 <p id="output"></p>
 <div class="hidden" id="MC_solutions">solutions_here</div>
 <div class="hidden" id="user_answers">user_answers_here</div>
 <div class="hidden" id="CardType">{{QType (0=kprim,1=mc,2=sc)}}</div>
 <p id="canswerresult"><b>Correct answers: x %</b></p>
-{{#Sources}}<p class="small" id="sources"><b>Sources:</b><br />{{Sources}}</p>{{/Sources}}
 {{#Extra 1}}<p class="small" id="extra1"><b>Extra 1:</b><br />{{Extra 1}}</p>{{/Extra 1}}
 
 <script>
@@ -76,9 +76,13 @@
                 else arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
                 //Colorize the atable and count correct answers.
                 if (colorizeatable) {
-                    if (solutions[i] && answers[i] === "1") {
+                    if ((type==2)&& (solutions[i]== "0" && answers[i]== "0"))
+                    {
+                        continue;
+                    }
+                    if ((solutions[i]=="1") && (answers[i]=="1" || (type==2)) ) {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
-                        canswers = canswers + 1;
+                        canswers = canswers + (answers[i]=="1");
                     } else if (!solutions[i] && answers[i] === "0") {
                         if (colorizefalsefalse) { arows[(type != 0) ? i : i + 1].setAttribute("class", "correct"); }
                         canswers = canswers + 1;
@@ -87,8 +91,11 @@
                     }
                 }
             }
-            var canswerresult = document.getElementById('canswerresult');
-            canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
+             var canswerresult = document.getElementById('canswerresult');
+            if (type==2)
+            { canswerresult.innerHTML =  canswers>=1 ? "<b> You were correct :)</b>" : "<b> you were wrong!</b>" ;}
+            else
+            { canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";}
             Persistence.clear();
         }
     }

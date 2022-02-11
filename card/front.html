@@ -8,7 +8,11 @@
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
 
+{{#Sources}}<p class="small" id="sources"><b>Sources:</b><br />{{Sources}}</p>{{/Sources}}
+<p/><input type="button" name="answer" onclick="ShowDiv()" value="hint" />
+<div id="showme"  style="display:none;" class="answer_list">
 <table style="border: 1px solid black" id="qtable"></table>
+</div>
 
 <div class="hidden" id="Q_solutions">{{Answers}}</div>
 <div class="hidden" id="user_answers">- - - -</div>
@@ -182,7 +186,9 @@
     function addCheckboxTickingShortcuts() {
         document.addEventListener('keydown', tickCheckboxOnNumberKeyDown, false);
     }
-
+function ShowDiv() {
+    document.getElementById("showme").style.display = "";
+}
     function isMobile() {
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             return true;
