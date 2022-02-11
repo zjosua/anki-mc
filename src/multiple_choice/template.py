@@ -54,7 +54,11 @@ card_front = """\
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
 
+{{#Sources}}<p class="small" id="sources"><b>Sources:</b><br />{{Sources}}</p>{{/Sources}}
+<p/><input type="button" name="answer" onclick="ShowDiv()" value="hint" />
+<div id="showme"  style="display:none;" class="answer_list">
 <table style="border: 1px solid black" id="qtable"></table>
+</div>
 
 <div class="hidden" id="Q_solutions">{{Answers}}</div>
 <div class="hidden" id="user_answers">- - - -</div>
@@ -228,7 +232,9 @@ card_front = """\
     function addCheckboxTickingShortcuts() {
         document.addEventListener('keydown', tickCheckboxOnNumberKeyDown, false);
     }
-
+function ShowDiv() {
+    document.getElementById("showme").style.display = "";
+}
     function isMobile() {
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             return true;
@@ -285,13 +291,13 @@ card_back = """\
 
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
+
 <table id="qtable"></table>
 <p id="output"></p>
 <div class="hidden" id="MC_solutions">solutions_here</div>
 <div class="hidden" id="user_answers">user_answers_here</div>
 <div class="hidden" id="CardType">{{QType (0=kprim,1=mc,2=sc)}}</div>
 <p id="canswerresult"><b>Correct answers: x %</b></p>
-{{#Sources}}<p class="small" id="sources"><b>Sources:</b><br />{{Sources}}</p>{{/Sources}}
 {{#Extra 1}}<p class="small" id="extra1"><b>Extra 1:</b><br />{{Extra 1}}</p>{{/Extra 1}}
 
 <script>
@@ -354,6 +360,10 @@ card_back = """\
                 else arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
                 //Colorize the atable and count correct answers.
                 if (colorizeatable) {
+                    if ((type==2)&& (solutions[i]== "0"))
+                    {
+                        continue;
+                    }
                     if (solutions[i] && answers[i] === "1") {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
                         canswers = canswers + 1;
@@ -365,8 +375,11 @@ card_back = """\
                     }
                 }
             }
-            var canswerresult = document.getElementById('canswerresult');
-            canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
+             var canswerresult = document.getElementById('canswerresult');
+            if (type==2)
+            { canswerresult.innerHTML =  canswers>=1 ? "<b> You were correct :)</b>" : "<b> you were wrong!</b>" ;}
+            else
+            { canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";}
             Persistence.clear();
         }
     }
