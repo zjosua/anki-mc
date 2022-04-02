@@ -352,7 +352,7 @@ card_back = """\
                 //Set the radio buttons in the atable.
                 if (type == 0) arows[i + 1].getElementsByTagName("td")[solutions[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
                 else arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
-                //Colorize the atable and count correct answers.
+                //Colorize the atable.
                 if (colorizeatable) {
                     if (solutions[i] && answers[i] === "1") {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
@@ -364,9 +364,19 @@ card_back = """\
                         arows[(type != 0) ? i : i + 1].setAttribute("class", "wrong");
                     }
                 }
+                //Count correct answers.
+                if (solutions[i] && answers[i] === "1") {
+                    canswers = canswers + 1;
+                } else if (!solutions[i] && answers[i] === "0") {
+                    canswers = canswers + 1;
+                }
             }
-            var canswerresult = document.getElementById('canswerresult');
-            canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
+            var canswerresult = document.getElementById("canswerresult");
+            if (type == 2) {
+                canswerresult.innerHTML = "<b>" + ((canswers / solutions.length == 1) ? "Correct.</b>" : "Nope.</b>");
+            } else {
+                canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
+            }
             Persistence.clear();
         }
     }
