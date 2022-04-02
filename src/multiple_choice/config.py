@@ -1,6 +1,6 @@
 # Multiple Choice for Anki
 #
-# Copyright (C) 2018-2021  zjosua <https://github.com/zjosua>
+# Copyright (C) 2018-2022  zjosua <https://github.com/zjosua>
 #
 # This file is based on config.py from Glutanimate's
 # Image Occlusion Enhanced Add-on for Anki
