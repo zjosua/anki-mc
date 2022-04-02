@@ -306,7 +306,8 @@ card_back = """\
                     wrongwrong: 'correct', // Should be wrong and got marked as wrong
                     correctcorrect: 'correct', // Should be correct and got marked as correct
                     wrongcorrect: 'wrong', // Should be wrong but got marked as correct
-                    correctwrong: 'wrong' // Should be correct but got marked as wrong
+                    correctwrong: 'wrong', // Should be correct but got marked as wrong
+                    eithernone: "wrong" // Kprim was marked neither correct nor wrong
                 }
             },
             atable: {
@@ -316,7 +317,8 @@ card_back = """\
                     wrongwrong: 'correct', // Should be wrong and got marked as wrong
                     correctcorrect: 'correct', // Should be correct and got marked as correct
                     wrongcorrect: 'wrong', // Should be wrong but got marked as correct
-                    correctwrong: 'wrong' // Should be correct but got marked as wrong
+                    correctwrong: 'wrong', // Should be correct but got marked as wrong
+                    eithernone: "wrong" // Kprim was marked neither correct nor wrong
                 }
             }
         }
@@ -359,6 +361,8 @@ card_back = """\
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongcorrect);
                         } else if (solutions[i] && answers[i] === "0"){
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.correctwrong);
+                        } else if (type == 0 && answers[i] === "-") {
+                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.eithernone);
                         }
                     }
                 }
@@ -383,6 +387,8 @@ card_back = """\
                         arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.wrongcorrect);
                     } else if (solutions[i] && answers[i] === "0") {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.correctwrong);
+                    } else if (type == 0 && answers[i] === "-") {
+                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.eithernone);
                     }
                 }
                 //Count correct answers.
