@@ -39,7 +39,7 @@ from .packaging import version
 from .template import *
 
 def getOrCreateModel():
-    model = mw.col.models.byName(aio_model)
+    model = mw.col.models.by_name(aio_model)
     if not model:
         # create model
         model = addModel(mw.col)
