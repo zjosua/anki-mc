@@ -143,10 +143,20 @@
             if (type == 0 && i == 0) {
                 i++; // to skip the first row containing no checkboxes when type is 'kprim'
             }
-            if (isOptionChecked(qrows[i], 0)) {
-                userAnswers += "1 ";
+            if (type == 0) {
+                if (isOptionChecked(qrows[i], 0)) {
+                    userAnswers += "1 ";
+                } else if (isOptionChecked(qrows[i], 1)) {
+                    userAnswers += "0 ";
+                } else {
+                    userAnswers += "- ";
+                }
             } else {
-                userAnswers += "0 ";
+                if (isOptionChecked(qrows[i], 0)) {
+                    userAnswers += "1 ";
+                } else {
+                    userAnswers += "0 ";
+                }
             }
         }
         return userAnswers.trim();  // Remove trailing space
