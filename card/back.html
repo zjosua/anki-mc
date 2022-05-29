@@ -52,7 +52,7 @@
             for (let i = 0; i < solutions.length; i++) {
                 solutions[i] = Number(solutions[i]);
             }
-            var answers = Persistence.getItem('user_answers').split(" ");
+            var answers = Persistence.getItem('user_answers');
             var type = document.getElementById('CardType').innerHTML;
             var qtable = document.getElementById('qtable');
             qtable.innerHTML = Persistence.getItem('qtable');
@@ -65,9 +65,9 @@
                 for (let i = 0; i < answers.length; i++) {
                     //Set the radio buttons in the qtable.
                     if (type == 0) {
-                        if (answers[i] === "1") {
+                        if (answers[i] === 1) {
                             qrows[i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = true;
-                        } else if (answers[i] === "0") {
+                        } else if (answers[i] === 0) {
                             qrows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].checked = true;
                         }
                     } else {
@@ -75,15 +75,15 @@
                     }
                     //Colorize the qtable.
                     if (options.qtable.colorize) {
-                        if (solutions[i] && answers[i] === "1") {
+                        if (solutions[i] && answers[i] === 1) {
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.correctcorrect);
-                        } else if (!solutions[i] && answers[i] === "0") {
+                        } else if (!solutions[i] && answers[i] === 0) {
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongwrong); 
-                        } else if (!solutions[i] && answers[i] === "1") {
+                        } else if (!solutions[i] && answers[i] === 1) {
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongcorrect);
-                        } else if (solutions[i] && answers[i] === "0"){
+                        } else if (solutions[i] && answers[i] === 0){
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.correctwrong);
-                        } else if (type == 0 && answers[i] === "-") {
+                        } else if (type == 0 && answers[i] === 2) {
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.eithernone);
                         }
                     }
@@ -101,22 +101,22 @@
                 else arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
                 //Colorize the atable.
                 if (options.atable.colorize) {
-                    if (solutions[i] && answers[i] === "1") {
+                    if (solutions[i] && answers[i] === 1) {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.correctcorrect);
-                    } else if (!solutions[i] && answers[i] === "0") {
+                    } else if (!solutions[i] && answers[i] === 0) {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.wrongwrong);
-                    } else if (!solutions[i] && answers[i] === "1") {
+                    } else if (!solutions[i] && answers[i] === 1) {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.wrongcorrect);
-                    } else if (solutions[i] && answers[i] === "0") {
+                    } else if (solutions[i] && answers[i] === 0) {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.correctwrong);
-                    } else if (type == 0 && answers[i] === "-") {
+                    } else if (type == 0 && answers[i] === 2) {
                         arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.eithernone);
                     }
                 }
                 //Count correct answers.
-                if (solutions[i] && answers[i] === "1") {
+                if (solutions[i] && answers[i] === 1) {
                     canswers = canswers + 1;
-                } else if (!solutions[i] && answers[i] === "0") {
+                } else if (!solutions[i] && answers[i] === 0) {
                     canswers = canswers + 1;
                 }
             }

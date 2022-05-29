@@ -138,28 +138,28 @@
     function getUserAnswers() {
         let type = document.getElementById("Card_Type").innerHTML;
         let qrows = document.getElementById("qtable").getElementsByTagName('tbody')[0].getElementsByTagName("tr");
-        let userAnswers = "";
+        let userAnswers = [];
         for (let i = 0; i < qrows.length; i++) {
             if (type == 0 && i == 0) {
                 i++; // to skip the first row containing no checkboxes when type is 'kprim'
             }
             if (type == 0) {
                 if (isOptionChecked(qrows[i], 0)) {
-                    userAnswers += "1 ";
+                    userAnswers.push(1);
                 } else if (isOptionChecked(qrows[i], 1)) {
-                    userAnswers += "0 ";
+                    userAnswers.push(0);
                 } else {
-                    userAnswers += "- ";
+                    userAnswers.push(2);
                 }
             } else {
                 if (isOptionChecked(qrows[i], 0)) {
-                    userAnswers += "1 ";
+                    userAnswers.push(1);
                 } else {
-                    userAnswers += "0 ";
+                    userAnswers.push(0);
                 }
             }
         }
-        return userAnswers.trim();  // Remove trailing space
+        return userAnswers
     }
 
     /**
