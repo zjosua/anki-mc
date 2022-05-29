@@ -1,6 +1,6 @@
 # Multiple Choice for Anki
 #
-# Copyright (C) 2018-2021  zjosua <https://github.com/zjosua>
+# Copyright (C) 2018-2022  zjosua <https://github.com/zjosua>
 #
 # This file is based on template.py from Glutanimate's
 # Cloze Overlapper Add-on for Anki
@@ -309,9 +309,30 @@ card_back = """\
     "use strict";
 
     function onLoad() {
-        var colorizeqtable = false;
-        var colorizeatable = true;
-        var colorizefalsefalse = true;
+        const options = {
+            qtable: {
+                visible: true,
+                colorize: false,
+                colors: { // Defines which class should be set
+                    wrongwrong: 'correct', // Should be wrong and got marked as wrong
+                    correctcorrect: 'correct', // Should be correct and got marked as correct
+                    wrongcorrect: 'wrong', // Should be wrong but got marked as correct
+                    correctwrong: 'wrong', // Should be correct but got marked as wrong
+                    eithernone: "wrong" // Kprim was marked neither correct nor wrong
+                }
+            },
+            atable: {
+                visible: true,
+                colorize: true,
+                colors: { // Defines which class should be set
+                    wrongwrong: 'correct', // Should be wrong and got marked as wrong
+                    correctcorrect: 'correct', // Should be correct and got marked as correct
+                    wrongcorrect: 'wrong', // Should be wrong but got marked as correct
+                    correctwrong: 'wrong', // Should be correct but got marked as wrong
+                    eithernone: "wrong" // Kprim was marked neither correct nor wrong
+                }
+            }
+        }
         // Check if Persistence is recognized to prevent errors when viewing note in "Manage Note Types..."
         if (Persistence.isAvailable && Persistence.getItem('Q_solutions') !== null) {
             // Parsing solutions
@@ -328,31 +349,35 @@ card_back = """\
             var atable = qtable.cloneNode(true);
             atable.setAttribute("id", "atable");
             output.innerHTML = "<hr id='answer' />" + atable.outerHTML;
-            document.getElementById('qtable').innerHTML = qtable.innerHTML;
-            var qrows = qtable.getElementsByTagName('tbody')[0].getElementsByTagName("tr");
-
-            for (let i = 0; i < answers.length; i++) {
-                //Set the radio buttons in the qtable.
-                if (type == 0) {
-                    if (answers[i] === "1") {
-                        qrows[i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = true;
-                    } else if (answers[i] === "0") {
-                        qrows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].checked = true;
-                    }
-                } else {
-                    qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = (answers[i] == 1) ? true : false;
-                }
-                //Colorize the qtable.
-                if (colorizeqtable) {
-                    if (solutions[i] && answers[i] === "1") {
-                        qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
-                    } else if (!solutions[i] && answers[i] === "0") {
-                        if (colorizefalsefalse) { qrows[(type != 0) ? i : i + 1].setAttribute("class", "correct"); }
+            if (options.qtable.visible) {
+                var qrows = qtable.getElementsByTagName('tbody')[0].getElementsByTagName("tr");
+                for (let i = 0; i < answers.length; i++) {
+                    //Set the radio buttons in the qtable.
+                    if (type == 0) {
+                        if (answers[i] === "1") {
+                            qrows[i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = true;
+                        } else if (answers[i] === "0") {
+                            qrows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].checked = true;
+                        }
                     } else {
-                        qrows[(type != 0) ? i : i + 1].setAttribute("class", "wrong");
+                        qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = (answers[i] == 1) ? true : false;
+                    }
+                    //Colorize the qtable.
+                    if (options.qtable.colorize) {
+                        if (solutions[i] && answers[i] === "1") {
+                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.correctcorrect);
+                        } else if (!solutions[i] && answers[i] === "0") {
+                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongwrong); 
+                        } else if (!solutions[i] && answers[i] === "1") {
+                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongcorrect);
+                        } else if (solutions[i] && answers[i] === "0"){
+                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.correctwrong);
+                        } else if (type == 0 && answers[i] === "-") {
+                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.eithernone);
+                        }
                     }
                 }
-            }
+            } else qtable.innerHTML = ""
 
             var arows = document.getElementById("atable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
             var canswers = 0;
@@ -363,21 +388,36 @@ card_back = """\
                 //Set the radio buttons in the atable.
                 if (type == 0) arows[i + 1].getElementsByTagName("td")[solutions[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
                 else arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
-                //Colorize the atable and count correct answers.
-                if (colorizeatable) {
+                //Colorize the atable.
+                if (options.atable.colorize) {
                     if (solutions[i] && answers[i] === "1") {
-                        arows[(type != 0) ? i : i + 1].setAttribute("class", "correct");
-                        canswers = canswers + 1;
+                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.correctcorrect);
                     } else if (!solutions[i] && answers[i] === "0") {
-                        if (colorizefalsefalse) { arows[(type != 0) ? i : i + 1].setAttribute("class", "correct"); }
-                        canswers = canswers + 1;
-                    } else {
-                        arows[(type != 0) ? i : i + 1].setAttribute("class", "wrong");
+                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.wrongwrong);
+                    } else if (!solutions[i] && answers[i] === "1") {
+                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.wrongcorrect);
+                    } else if (solutions[i] && answers[i] === "0") {
+                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.correctwrong);
+                    } else if (type == 0 && answers[i] === "-") {
+                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.eithernone);
                     }
                 }
+                //Count correct answers.
+                if (solutions[i] && answers[i] === "1") {
+                    canswers = canswers + 1;
+                } else if (!solutions[i] && answers[i] === "0") {
+                    canswers = canswers + 1;
+                }
             }
-            var canswerresult = document.getElementById('canswerresult');
-            canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
+            var canswerresult = document.getElementById("canswerresult");
+            if (type == 2) {
+                canswerresult.innerHTML = "<b>" + ((canswers / solutions.length == 1) ? "Correct.</b>" : "Nope.</b>");
+            } else {
+                canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
+            }
+            if (!options.atable.visible) {
+                atable.innerHTML = "";
+            }
             Persistence.clear();
         }
     }
@@ -523,7 +563,7 @@ def addModel(col):
 def updateTemplate(col):
     """Update add-on note templates"""
     print(f"Updating {aio_model} note template")
-    model = col.models.byName(aio_model)
+    model = col.models.by_name(aio_model)
     template = model['tmpls'][0]
     template['qfmt'] = card_front
     template['afmt'] = card_back

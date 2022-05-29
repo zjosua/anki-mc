@@ -1,6 +1,6 @@
 # Multiple Choice for Anki
 #
-# Copyright (C) 2018-2021  zjosua <https://github.com/zjosua>
+# Copyright (C) 2018-2022  zjosua <https://github.com/zjosua>
 #
 # This file is based on __init__.py from Glutanimate's
 # Cloze Overlapper Add-on for Anki
@@ -39,7 +39,7 @@ from .packaging import version
 from .template import *
 
 def getOrCreateModel():
-    model = mw.col.models.byName(aio_model)
+    model = mw.col.models.by_name(aio_model)
     if not model:
         # create model
         model = addModel(mw.col)
