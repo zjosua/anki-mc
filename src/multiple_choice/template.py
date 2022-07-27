@@ -54,7 +54,9 @@ card_front = """\
 {{#Title}}<h3 id="myH1">{{Title}}</h3>{{/Title}}
 {{#Question}}<p>{{Question}}</p>{{/Question}}
 
-<table style="border: 1px solid black" id="qtable"></table>
+<div class="tappable">
+    <table style="border: 1px solid black" id="qtable"></table>
+</div>
 
 <div class="hidden" id="Q_solutions">{{Answers}}</div>
 <div class="hidden" id="Card_Type">{{QType (0=kprim,1=mc,2=sc)}}</div>
@@ -184,7 +186,7 @@ card_front = """\
     function getUserAnswers() {
         let type = document.getElementById("Card_Type").innerHTML;
         let qrows = document.getElementById("qtable").getElementsByTagName('tbody')[0].getElementsByTagName("tr");
-        let userAnswers = "";
+        let userAnswers = [];
         for (let i = 0; i < qrows.length; i++) {
             if (type == 0 && i == 0) {
                 i++; // to skip the first row containing no checkboxes when type is 'kprim'
