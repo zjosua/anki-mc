@@ -44,8 +44,8 @@ from .packaging import version
 
 # default configurations
 # TODO: update version number before release
-default_conf_local = {'version': "2.5.0"}
-default_conf_syncd = {'version': "2.5.0"}
+default_conf_local = {'version': "2.5.1"}
+default_conf_syncd = {'version': "2.5.1"}
 
 def getSyncedConfig():
     # Synced preferences
