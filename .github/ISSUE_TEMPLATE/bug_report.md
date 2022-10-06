@@ -11,7 +11,7 @@ assignees: ''
 it and create a pull request that adds the option to switch to your preferred
 color coding instead. The current color coding is exactly how I want it to be.
 Just because I share my code doesn't mean that I provide a service to adapt it
-to everyone's and their mom's wishes."
+to everyone's and their mom's wishes.*
 
 #### Describe the bug
 *A clear and concise description of what the bug is.*
