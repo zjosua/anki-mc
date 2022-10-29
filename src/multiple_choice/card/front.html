@@ -164,6 +164,12 @@
         return userAnswers
     }
 
+    function getCorrectAnswers() {
+        let solutions = document.getElementById("Q_solutions").innerHTML.split(" ").map(string => Number(string));
+
+        return solutions;
+    }
+
     /**
      * On checking an option this collects and stores answers in between front/back of the card.
      *
@@ -175,7 +181,7 @@
         if (Persistence.isAvailable()) {
             Persistence.clear();
             Persistence.setItem('user_answers', getUserAnswers());
-            Persistence.setItem('Q_solutions', document.getElementById("Q_solutions").innerHTML);
+            Persistence.setItem('Q_solutions', getCorrectAnswers());
             Persistence.setItem('qtable', document.getElementById("qtable").innerHTML);
         }
     }

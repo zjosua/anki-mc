@@ -47,12 +47,9 @@
         // Check if Persistence is recognized to prevent errors when viewing note in "Manage Note Types..."
         if (Persistence.isAvailable && Persistence.getItem('Q_solutions') !== null) {
             // Parsing solutions
-            console.log(Persistence.getItem('Q_solutions'));
-            var solutions = Persistence.getItem('Q_solutions').split(" ");
-            for (let i = 0; i < solutions.length; i++) {
-                solutions[i] = Number(solutions[i]);
-            }
+            var solutions = Persistence.getItem('Q_solutions');
             var answers = Persistence.getItem('user_answers');
+
             var type = document.getElementById('CardType').innerHTML;
             var qtable = document.getElementById('qtable');
             qtable.innerHTML = Persistence.getItem('qtable');
@@ -78,10 +75,10 @@
                         if (solutions[i] && answers[i] === 1) {
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.correctcorrect);
                         } else if (!solutions[i] && answers[i] === 0) {
-                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongwrong); 
+                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongwrong);
                         } else if (!solutions[i] && answers[i] === 1) {
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongcorrect);
-                        } else if (solutions[i] && answers[i] === 0){
+                        } else if (solutions[i] && answers[i] === 0) {
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.correctwrong);
                         } else if (type == 0 && answers[i] === 2) {
                             qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.eithernone);
