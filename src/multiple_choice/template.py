@@ -40,7 +40,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 from anki.consts import MODEL_STD
-from aqt import mw
+from aqt import (mw, Collection)
 
 aio_model = "AllInOne (kprim, mc, sc)"
 aio_card = "AllInOne (kprim, mc, sc)"
@@ -71,27 +71,27 @@ def fillTemplateAndModelFromFile(template, model):
         model['css'] = f.read()
 
 
-def addModel(col):
+def addModel(col: Collection):
     """Add add-on note type to collection"""
     models = col.models
     model = models.new(aio_model)
     model['type'] = MODEL_STD
     # Add fields:
     for i in aio_fields.keys():
-        fld = models.newField(aio_fields[i])
-        models.addField(model, fld)
+        fld = models.new_field(aio_fields[i])
+        models.add_field(model, fld)
     # Add template
-    template = models.newTemplate(aio_card)
+    template = models.new_template(aio_card)
 
     fillTemplateAndModelFromFile(template, model)
 
     model['sortf'] = 0  # set sortfield to question
-    models.addTemplate(model, template)
+    models.add_template(model, template)
     models.add(model)
     return model
 
 
-def updateTemplate(col):
+def updateTemplate(col: Collection):
     """Update add-on note templates"""
     print(f"Updating {aio_model} note template")
     model = col.models.by_name(aio_model)

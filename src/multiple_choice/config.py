@@ -35,6 +35,13 @@
 
 """
 Sets up configuration
+
+There are two types of configuration:
+1. Config saved either within the collection (`mw.col.set_config()`) or within
+    the profile (`mw.pm.set_config()`). Only the collection is synced across
+    devices. These are used e.g. to store the addon's version.
+2. Config stored in a JSON file inside the addon folder which can also be
+    accessed and changed from within Anki from the addons window.
 """
 
 from aqt import mw
@@ -47,6 +54,7 @@ from .packaging import version
 default_conf_local = {'version': "2.6.0"}
 default_conf_syncd = {'version': "2.6.0"}
 
+
 def getSyncedConfig():
     # Synced preferences
     if mw.col.get_config("mc_conf") is None:
@@ -55,6 +63,7 @@ def getSyncedConfig():
         mw.col.setMod()
 
     return mw.col.get_config("mc_conf")
+
 
 def updateSyncedConfig():
     print("Updating config DB from earlier MC release")
@@ -66,12 +75,14 @@ def updateSyncedConfig():
     mw.col.set_config("mc_conf", tmp_conf)
     mw.col.setMod()
 
+
 def getLocalConfig():
     # Local preferences
     if 'mc_conf' not in mw.pm.profile:
         mw.pm.profile["mc_conf"] = default_conf_local
 
     return mw.pm.profile["mc_conf"]
+
 
 def updateLocalConfig():
     for key in list(default_conf_local.keys()):

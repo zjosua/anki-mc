@@ -38,6 +38,7 @@ from .config import *
 from .packaging import version
 from .template import *
 
+
 def getOrCreateModel():
     model = mw.col.models.by_name(aio_model)
     if not model:
@@ -49,6 +50,7 @@ def getOrCreateModel():
         return updateTemplate(mw.col)
     return model
 
+
 def delayedInit():
     """Setup add-on config and templates, update if necessary"""
     getSyncedConfig()
@@ -59,5 +61,5 @@ def delayedInit():
     if version.parse(mw.pm.profile['mc_conf'].get('version', 0)) < version.parse(default_conf_syncd['version']):
         updateLocalConfig()
 
-gui_hooks.profile_did_open.append(delayedInit)
 
+gui_hooks.profile_did_open.append(delayedInit)
