@@ -20,32 +20,55 @@
     "use strict";
 
     function onLoad() {
-        const options = {
-            qtable: {
-                visible: true,
-                colorize: false,
-                colors: { // Defines which class should be set
-                    wrongwrong: 'correct', // Should be wrong and got marked as wrong
-                    correctcorrect: 'correct', // Should be correct and got marked as correct
-                    wrongcorrect: 'wrong', // Should be wrong but got marked as correct
-                    correctwrong: 'wrong', // Should be correct but got marked as wrong
-                    eithernone: "wrong" // Kprim was marked neither correct nor wrong
-                }
-            },
-            atable: {
-                visible: true,
-                colorize: true,
-                colors: { // Defines which class should be set
-                    wrongwrong: 'correct', // Should be wrong and got marked as wrong
-                    correctcorrect: 'correct', // Should be correct and got marked as correct
-                    wrongcorrect: 'wrong', // Should be wrong but got marked as correct
-                    correctwrong: 'wrong', // Should be correct but got marked as wrong
-                    eithernone: "wrong" // Kprim was marked neither correct nor wrong
-                }
-            }
-        }
         // Check if Persistence is recognized to prevent errors when viewing note in "Manage Note Types..."
         if (Persistence.isAvailable && Persistence.getItem('Q_solutions') !== null) {
+
+            const DEFAULT_COLORING = { // Defines which class should be set
+                wrongAndNotTicked: 'correct',
+                correctAndTicked: 'correct',
+                wrongButTicked: 'wrong',
+                correctButNotTicked: 'wrong',
+                withoutSelection: "wrong" // Kprim was marked neither correct nor wrong
+            };
+
+            const ALTERNATE_COLORING = { // Defines which class should be set
+                wrongAndNotTicked: '',
+                correctAndTicked: '',
+                wrongButTicked: 'wrong',
+                correctButNotTicked: 'correct',
+                withoutSelection: "wrong" // Kprim was marked neither correct nor wrong
+            };
+
+            // Options are modified according to user's meta.json in the addon's folder
+            const OPTIONS = {
+                qtable: {
+                    visible: true,
+                    colorize: false,
+                    colors: DEFAULT_COLORING
+                },
+                atable: {
+                    visible: true,
+                    colorize: true,
+                    colors: DEFAULT_COLORING
+                }
+            };
+
+            const colorizeTableRow = function (row, tableType, solution, answer) {
+                let colorOptions = OPTIONS[tableType].colors
+
+                if ((solution === 1) && (answer === 1)) {
+                    row.setAttribute("class", colorOptions.correctAndTicked);
+                } else if ((solution === 0) && (answer === 0)) {
+                    row.setAttribute("class", colorOptions.wrongAndNotTicked);
+                } else if ((solution === 0) && (answer === 1)) {
+                    row.setAttribute("class", colorOptions.wrongButTicked);
+                } else if ((solution === 1) && (answer === 0)) {
+                    row.setAttribute("class", colorOptions.correctButNotTicked);
+                } else if (type == 0 && (answer === 2)) {
+                    row.setAttribute("class", colorOptions.withoutSelection);
+                }
+            }
+
             // Parsing solutions
             var solutions = Persistence.getItem('Q_solutions');
             var answers = Persistence.getItem('user_answers');
@@ -53,63 +76,64 @@
             var type = document.getElementById('CardType').innerHTML;
             var qtable = document.getElementById('qtable');
             qtable.innerHTML = Persistence.getItem('qtable');
-            var output = document.getElementById("output");
-            var atable = qtable.cloneNode(true);
-            atable.setAttribute("id", "atable");
-            output.innerHTML = "<hr id='answer' />" + atable.outerHTML;
-            if (options.qtable.visible) {
+
+            if (OPTIONS.qtable.visible) {
                 var qrows = qtable.getElementsByTagName('tbody')[0].getElementsByTagName("tr");
                 for (let i = 0; i < answers.length; i++) {
                     //Set the radio buttons in the qtable.
                     if (type == 0) {
                         if (answers[i] === 1) {
-                            qrows[i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = true;
+                            let radioButton = qrows[i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+                            radioButton.checked = true;
+                            radioButton.disabled = true;
                         } else if (answers[i] === 0) {
-                            qrows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].checked = true;
+                            let radioButton = qrows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0];
+                            radioButton.checked = true;
+                            radioButton.disabled = true;
                         }
                     } else {
-                        qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = (answers[i] == 1) ? true : false;
+                        let radioButton = qrows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+                        radioButton.checked = (answers[i] === 1) ? true : false;
+                        radioButton.disabled = true;
                     }
                     //Colorize the qtable.
-                    if (options.qtable.colorize) {
-                        if (solutions[i] && answers[i] === 1) {
-                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.correctcorrect);
-                        } else if (!solutions[i] && answers[i] === 0) {
-                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongwrong);
-                        } else if (!solutions[i] && answers[i] === 1) {
-                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.wrongcorrect);
-                        } else if (solutions[i] && answers[i] === 0) {
-                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.correctwrong);
-                        } else if (type == 0 && answers[i] === 2) {
-                            qrows[(type != 0) ? i : i + 1].setAttribute("class", options.qtable.colors.eithernone);
-                        }
+                    if (OPTIONS.qtable.colorize) {
+                        colorizeTableRow(qrows[(type != 0) ? i : i + 1], "qtable", solutions[i], answers[i]);
                     }
                 }
             } else qtable.innerHTML = ""
 
-            var arows = document.getElementById("atable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+            if (OPTIONS.atable.visible) {
+                var output = document.getElementById("output");
+                var atable = qtable.cloneNode(true);
+                atable.setAttribute("id", "atable");
+                output.innerHTML = "<hr id='answer' />" + atable.outerHTML;
+
+                var arows = document.getElementById("atable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+            }
             var canswers = 0;
             for (let i = 0; i < solutions.length; i++) {
-                //Rename the radio buttons of the atable to avoid interference with those in the qtable.
-                if (type == 0) arows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
-                arows[(type != 0) ? i : i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
-                //Set the radio buttons in the atable.
-                if (type == 0) arows[i + 1].getElementsByTagName("td")[solutions[i] ? 0 : 1].getElementsByTagName("input")[0].checked = true;
-                else arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0].checked = solutions[i] ? true : false;
-                //Colorize the atable.
-                if (options.atable.colorize) {
-                    if (solutions[i] && answers[i] === 1) {
-                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.correctcorrect);
-                    } else if (!solutions[i] && answers[i] === 0) {
-                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.wrongwrong);
-                    } else if (!solutions[i] && answers[i] === 1) {
-                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.wrongcorrect);
-                    } else if (solutions[i] && answers[i] === 0) {
-                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.correctwrong);
-                    } else if (type == 0 && answers[i] === 2) {
-                        arows[(type != 0) ? i : i + 1].setAttribute("class", options.atable.colors.eithernone);
+                if (OPTIONS.atable.visible) {
+                    //Rename the radio buttons of the atable to avoid interference with those in the qtable.
+                    if (type == 0) arows[i + 1].getElementsByTagName("td")[1].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
+                    arows[(type != 0) ? i : i + 1].getElementsByTagName("td")[0].getElementsByTagName("input")[0].setAttribute("name", "ans_" + ((type != 2) ? String(i + 1) : 'A') + "_solution");
+                    //Set the radio buttons in the atable.
+                    if (type == 0) {
+                        let radioButton = arows[i + 1].getElementsByTagName("td")[solutions[i] ? 0 : 1].getElementsByTagName("input")[0];
+                        radioButton.checked = true;
+                        radioButton.disabled = true;
+                    }
+                    else {
+                        let radioButton = arows[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+                        radioButton.checked = solutions[i] ? true : false;
+                        radioButton.disabled = true;
+                    }
+                    //Colorize the atable.
+                    if (OPTIONS.atable.colorize) {
+                        colorizeTableRow(arows[(type != 0) ? i : i + 1], "atable", solutions[i], answers[i]);
                     }
                 }
+
                 //Count correct answers.
                 if (solutions[i] && answers[i] === 1) {
                     canswers = canswers + 1;
@@ -117,17 +141,15 @@
                     canswers = canswers + 1;
                 }
             }
-            var canswerresult = document.getElementById("canswerresult");
-            if (type == 2) {
-                canswerresult.innerHTML = "<b>" + ((canswers / solutions.length == 1) ? "Correct.</b>" : "Nope.</b>");
-            } else {
-                canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
-            }
-            if (!options.atable.visible) {
-                atable.innerHTML = "";
-            }
-            Persistence.clear();
         }
+        var canswerresult = document.getElementById("canswerresult");
+        if (type == 2) {
+            canswerresult.innerHTML = "<b>" + ((canswers / solutions.length == 1) ? "Correct.</b>" : "Nope.</b>");
+        } else {
+            canswerresult.innerHTML = "<b>Correct answers: " + Math.round(canswers / solutions.length * 100) + " %</b>";
+        }
+
+        Persistence.clear();
     }
 
     function isMobile() {

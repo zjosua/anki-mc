@@ -38,6 +38,7 @@ Manages note type and templates
 
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
+import re
 
 from anki.consts import MODEL_STD
 from aqt import (mw, Collection)
@@ -59,14 +60,38 @@ aio_fields = {
 }
 
 
-def fillTemplateAndModelFromFile(template, model):
+def getOptionsJavaScriptFromConfig(user_config):
+    return (
+        "const OPTIONS = {\n"
+        "    qtable: {\n"
+        f"        visible: true,\n"
+        f"        colorize: {user_config['colorQuestionTable']},\n"
+        f"        colors: {user_config['answerColoring']}\n"
+        "    },\n"
+        "    atable: {\n"
+        f"        visible: {'false' if user_config['hideAnswerTable'] == 'true' else 'true'},\n"
+        f"        colorize: {user_config['colorAnswerTable']},\n"
+        f"        colors: {user_config['answerColoring']}\n"
+        "    }\n"
+        "};\n"
+    )
+
+
+def fillTemplateAndModelFromFile(template, model, user_config={}):
     addonFolderName = mw.addonManager.addonFromModule(__name__)
     addonPath = mw.addonManager.addonsFolder() + '/' + addonFolderName + '/'
+
+    if user_config:
+        options_java_script = getOptionsJavaScriptFromConfig(user_config)
 
     with open(addonPath + 'card/front.html', encoding="utf-8") as f:
         template['qfmt'] = f.read()
     with open(addonPath + 'card/back.html', encoding="utf-8") as f:
-        template['afmt'] = f.read()
+        back_template = f.read()
+        if user_config:
+            back_template = re.sub(
+                r'const OPTIONS.*?;', options_java_script, back_template, 1, re.DOTALL)
+        template['afmt'] = back_template
     with open(addonPath + 'card/css.css', encoding="utf-8") as f:
         model['css'] = f.read()
 
@@ -91,13 +116,13 @@ def addModel(col: Collection):
     return model
 
 
-def updateTemplate(col: Collection):
+def updateTemplate(col: Collection, user_config={}):
     """Update add-on note templates"""
     print(f"Updating {aio_model} note template")
     model = col.models.by_name(aio_model)
     template = model['tmpls'][0]
 
-    fillTemplateAndModelFromFile(template, model)
+    fillTemplateAndModelFromFile(template, model, user_config)
 
     col.models.save(model)
     return model

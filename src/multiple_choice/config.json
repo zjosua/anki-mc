@@ -1,3 +1,6 @@
 {
-    "answerColoring": "default"
+    "answerColoring": "DEFAULT_COLORING",
+    "colorQuestionTable": "false",
+    "colorAnswerTable": "true",
+    "hideAnswerTable": "false"
 }

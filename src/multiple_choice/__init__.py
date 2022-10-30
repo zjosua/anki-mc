@@ -32,6 +32,8 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+import json
+
 from aqt import gui_hooks, mw
 
 from .config import *
@@ -51,7 +53,7 @@ def getOrCreateModel():
     return model
 
 
-def delayedInit():
+def manage_multiple_choice_note_type():
     """Setup add-on config and templates, update if necessary"""
     getSyncedConfig()
     getLocalConfig()
@@ -62,4 +64,15 @@ def delayedInit():
         updateLocalConfig()
 
 
-gui_hooks.profile_did_open.append(delayedInit)
+def update_multiple_choice_note_type_from_config(user_config: str):
+    """Set options according to saved user's meta.json in the addon's folder"""
+    user_config_dict = json.loads(user_config)
+    updateTemplate(mw.col, user_config_dict)
+    return user_config
+
+
+# Only execute addon after profile and collection are fully initialized
+gui_hooks.profile_did_open.append(manage_multiple_choice_note_type)
+
+gui_hooks.addon_config_editor_will_save_json.append(
+    update_multiple_choice_note_type_from_config)
