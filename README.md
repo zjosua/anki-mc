@@ -1,22 +1,31 @@
-## anki-mc
+<!-- omit in toc -->
+# anki-mc
 
 Adds multiple choice cards to Anki.
 
-### Screenshots
+- [Screenshots](#screenshots)
+- [Compatibility](#compatibility)
+- [Usage](#usage)
+  - [Creating / Editing](#creating--editing)
+  - [Reviewing](#reviewing)
+  - [Addon Config](#addon-config)
+- [License and Credits](#license-and-credits)
 
-| Single Choice                                   | Multiple Choice                                     | Kprim                           |
-|:-----------------------------------------------:|:---------------------------------------------------:|:-------------------------------:|
+## Screenshots
+
+|                  Single Choice                  |                   Multiple Choice                   |              Kprim              |
+| :---------------------------------------------: | :-------------------------------------------------: | :-----------------------------: |
 | ![Single Choice](screenshots/single_choice.png) | ![Multiple Choice](screenshots/multiple_choice.png) | ![Kprim](screenshots/kprim.png) |
 
-### Compatibility
+## Compatibility
 
 Anki 2.1.20 or higher is required for this add-on to work.
 
 Cards created with this add-on can be reviewed with all Computer and mobile apps and on AnkiWeb.
 
-### Usage
+## Usage
 
-#### Creating / Editing
+### Creating / Editing
 
 The note type is automatically added the first time you start Anki after installing the add-on.
 
@@ -30,12 +39,19 @@ If you don't need all the choices, just leave the remaining "Q_" fields blank an
 
 ![Editing](screenshots/edit.png)
 
-#### Reviewing
+### Reviewing
 
 Select the correct and incorrect choices accordingly and click "Show Answer".
 The add-on will automatically style your choices based on whether you answered correctly or not.
 
-### License and Credits
+### Addon Config
+
+If you want to change the way your answers are styled (e.g. color green what you should have chosen instead of what you have chosen correctly) you can use the addon's config to switch between different styles:
+![Addon Config Window](screenshots/addon_config.png)
+(Tools -> Addons -> "Select the multiple choice addon" -> Config)
+
+
+## License and Credits
 
 *Multiple Choice for Anki* is *Copyright © 2022 [zjosua](https://github.com/zjosua)*
 
