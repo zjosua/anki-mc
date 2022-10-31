@@ -77,6 +77,16 @@
             var qtable = document.getElementById('qtable');
             qtable.innerHTML = Persistence.getItem('qtable');
 
+            // Clone atable from qtable before colorizing the qtable
+            if (OPTIONS.atable.visible) {
+                var output = document.getElementById("output");
+                var atable = qtable.cloneNode(true);
+                atable.setAttribute("id", "atable");
+                output.innerHTML = "<hr id='answer' />" + atable.outerHTML;
+
+                var arows = document.getElementById("atable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+            }
+
             if (OPTIONS.qtable.visible) {
                 var qrows = qtable.getElementsByTagName('tbody')[0].getElementsByTagName("tr");
                 for (let i = 0; i < answers.length; i++) {
@@ -103,14 +113,6 @@
                 }
             } else qtable.innerHTML = ""
 
-            if (OPTIONS.atable.visible) {
-                var output = document.getElementById("output");
-                var atable = qtable.cloneNode(true);
-                atable.setAttribute("id", "atable");
-                output.innerHTML = "<hr id='answer' />" + atable.outerHTML;
-
-                var arows = document.getElementById("atable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-            }
             var canswers = 0;
             for (let i = 0; i < solutions.length; i++) {
                 if (OPTIONS.atable.visible) {
