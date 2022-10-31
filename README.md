@@ -9,6 +9,7 @@ Adds multiple choice cards to Anki.
   - [Creating / Editing](#creating--editing)
   - [Reviewing](#reviewing)
   - [Addon Config](#addon-config)
+  - [Known Issues](#known-issues)
 - [License and Credits](#license-and-credits)
 
 ## Screenshots
@@ -50,6 +51,14 @@ If you want to change the way your answers are styled (e.g. color green what you
 ![Addon Config Window](screenshots/addon_config.png)
 (Tools -> Addons -> "Select the multiple choice addon" -> Config)
 
+
+### Known Issues
+- [I don't understand the colors](https://github.com/zjosua/anki-mc/pull/90)
+  - Use the [addon's config](#addon-config) with `ALTERNATE_COLORING`
+- [Turn off shuffling/randomization of answers](https://github.com/zjosua/anki-mc/issues/87#issuecomment-1259818989)
+  - Possible by duplicating the note type `AllInOne (kprim, mc, sc)` and replacing `qanda = shuffle(qanda);` with `// qanda = shuffle(qanda);`.
+- [More than 5 answer options](https://github.com/zjosua/anki-mc/issues/81)
+  - Possible by slight modification of the note type (fields) and tempalte HTML
 
 ## License and Credits
 
