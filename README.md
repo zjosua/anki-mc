@@ -20,7 +20,7 @@ Adds multiple choice cards to Anki.
 
 ## Compatibility
 
-Anki 2.1.20 or higher is required for this add-on to work.
+Anki 2.1.44 or higher is required for this add-on to work.
 
 Cards created with this add-on can be reviewed with all Computer and mobile apps and on AnkiWeb.
 
@@ -58,7 +58,7 @@ If you want to change the way your answers are styled (e.g. color green what you
 - [Turn off shuffling/randomization of answers](https://github.com/zjosua/anki-mc/issues/87#issuecomment-1259818989)
   - Possible by duplicating the note type `AllInOne (kprim, mc, sc)` and replacing `qanda = shuffle(qanda);` with `// qanda = shuffle(qanda);`.
 - [More than 5 answer options](https://github.com/zjosua/anki-mc/issues/81)
-  - Possible by slight modification of the note type (fields) and tempalte HTML
+  - Possible with slight modification of the note type (fields) and tempalte HTML
 
 ## License and Credits
 
