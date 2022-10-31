@@ -166,14 +166,3 @@ def update_multiple_choice_note_type_from_config(user_config: str):
     user_config_dict = json.loads(user_config)
     updateTemplate(mw.col, user_config_dict)
     return user_config
-
-
-def initialize_addon():
-    from aqt.gui_hooks import (addon_config_editor_will_save_json,
-                               profile_did_open)
-
-    # Only execute addon after profile and collection are fully initialized
-    profile_did_open.append(manage_multiple_choice_note_type)
-
-    addon_config_editor_will_save_json.append(
-        update_multiple_choice_note_type_from_config)

@@ -32,7 +32,15 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+from aqt.gui_hooks import (addon_config_editor_will_save_json,
+                           profile_did_open)
 
-from .template import initialize_addon
+from .template import (manage_multiple_choice_note_type,
+                       update_multiple_choice_note_type_from_config)
 
-initialize_addon()
+
+# Only execute addon after profile and collection are fully initialized
+profile_did_open.append(manage_multiple_choice_note_type)
+
+addon_config_editor_will_save_json.append(
+    update_multiple_choice_note_type_from_config)
