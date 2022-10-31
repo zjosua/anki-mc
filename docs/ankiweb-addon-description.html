@@ -1,19 +1,6 @@
 Adds multiple choice cards to Anki.
 
-<ul>
-    <li><a href="#screenshots">Screenshots</a></li>
-    <li><a href="#compatibility">Compatibility</a></li>
-    <li><a href="#usage">Usage</a>
-        <ul>
-            <li><a href="#creating--editing">Creating / Editing</a></li>
-            <li><a href="#reviewing">Reviewing</a></li>
-            <li><a href="#addon-config">Addon Config</a></li>
-            <li><a href="#known-issues">Known Issues</a></li>
-        </ul>
-    </li>
-    <li><a href="#license-and-credits">License and Credits</a></li>
-    <li><a href="#support">Support</a></li>
-</ul>
+<ul><li><a href="#screenshots">Screenshots</a></li><li><a href="#compatibility">Compatibility</a></li><li><a href="#usage">Usage</a><ul><li><a href="#creating--editing">Creating / Editing</a></li><li><a href="#reviewing">Reviewing</a></li><li><a href="#addon-config">Addon Config</a></li><li><a href="#known-issues">Known Issues</a></li></ul></li><li><a href="#license-and-credits">License and Credits</a></li><li><a href="#support">Support</a></li></ul>
 
 <b id="screenshots">SCREENSHOTS</b>
 
@@ -41,7 +28,7 @@ It can be either 0 (Kprim), 1 (Multiple Choice) or 2 (Single Choice).
 The Screenshots section shows how the question types look.
 These values in the &quot;Answer&quot; field must be separated by a single space.
 The order and number of values in the &quot;Answer&quot; field must correspond with the choices &quot;Q_1&quot; to &quot;Q_5&quot;.
-If you don&#39;t need all the choices, just leave the remaining &quot;Q_&quot; fields blank and only enter as many values as you need in the &quot;Answers&quot; field.
+If you don't need all the choices, just leave the remaining &quot;Q_&quot; fields blank and only enter as many values as you need in the &quot;Answers&quot; field.
 
 <img src="https://raw.githubusercontent.com/zjosua/anki-mc/master/screenshots/edit.png" alt="Editing">
 
@@ -59,33 +46,7 @@ you have chosen correctly) you can use the addon's config to switch between diff
 
 <b id="known-issues">Known Issues</b>
 
-<ul>
-    <li><a href="https://github.com/zjosua/anki-mc/pull/90">I don't
-            understand the colors</a>
-        <ul>
-            <li>Use the <a href="#addon-config">addon's config</a> with
-                <code>ALTERNATE_COLORING</code>
-            </li>
-        </ul>
-    </li>
-    <li><a href="https://github.com/zjosua/anki-mc/issues/87#issuecomment-1259818989">Turn
-            off shuffling/randomization of answers</a>
-        <ul>
-            <li>Possible by duplicating the note type
-                <code>AllInOne (kprim, mc, sc)</code> and replacing
-                <code>qanda = shuffle(qanda);</code> with
-                <code>// qanda = shuffle(qanda);</code>.
-            </li>
-        </ul>
-    </li>
-    <li><a href="https://github.com/zjosua/anki-mc/issues/81">More than 5
-            answer options</a>
-        <ul>
-            <li>Possible by slight modification of the note type (fields) and
-                tempalte HTML</li>
-        </ul>
-    </li>
-</ul>
+<ul><li><a href="https://github.com/zjosua/anki-mc/pull/90">I don't understand the colors</a><ul><li>Use the <a href="#addon-config">addon's config</a> with<code>ALTERNATE_COLORING</code></li></ul></li><li><a href="https://github.com/zjosua/anki-mc/issues/87#issuecomment-1259818989">Turn off shuffling/randomization of answers</a><ul><li>Possible by duplicating the note type<code>AllInOne (kprim, mc, sc)</code> and replacing<code>qanda = shuffle(qanda);</code> with<code>// qanda = shuffle(qanda);</code>.</li></ul></li><li><a href="https://github.com/zjosua/anki-mc/issues/81">More than 5 answer options</a><ul><li>Possible by slight modification of the note type (fields) and tempalte HTML</li></ul></li></ul>
 
 <b id="license-and-credits">LICENSE AND CREDITS</b>
 
@@ -95,12 +56,12 @@ It is licensed under the AGPLv3.
 For more information refer to the <a href="https://github.com/zjosua/anki-mc/blob/master/LICENSE">LICENSE</a> file.
 
 A bunch of code in this add-on is based on the Anki add-ons <a href="https://github.com/glutanimate/image-occlusion-enhanced">Image Occlusion Enhanced</a> and <a href="https://github.com/glutanimate/cloze-overlapper">Cloze Overlapper</a> by Glutanimate.
-<a href="https://glutanimate.com/support-my-work/">Click here to support Glutanimate&#39;s work.</a>
+<a href="https://glutanimate.com/support-my-work/">Click here to support Glutanimate's work.</a>
 
-Persistence is achieved using the code from <a href="https://github.com/SimonLammer/anki-persistence">Simon Lammer&#39;s anki-persistence</a>.
+Persistence is achieved using the code from <a href="https://github.com/SimonLammer/anki-persistence">Simon Lammer's anki-persistence</a>.
 Great work Simon!
 
-<a href="https://github.com/Schlauer-Hax">Hax</a> merged my Multiple Choice card template with Simon Lammer&#39;s persistence code.
+<a href="https://github.com/Schlauer-Hax">Hax</a> merged my Multiple Choice card template with Simon Lammer's persistence code.
 He also reworked my card templates into one single all-in-one template.
 Thanks a lot!
 
