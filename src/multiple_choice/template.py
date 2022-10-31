@@ -33,15 +33,20 @@
 # Any modifications to this file must keep this entire header intact.
 
 """
-Manages note type and templates
+Manages note type and card templates
 """
 
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
+
+import json
 import re
 
 from anki.consts import MODEL_STD
-from aqt import (mw, Collection)
+from aqt import Collection, mw
+
+from .config import *
+from .packaging import version
 
 aio_model = "AllInOne (kprim, mc, sc)"
 aio_card = "AllInOne (kprim, mc, sc)"
@@ -61,17 +66,22 @@ aio_fields = {
 
 
 def getOptionsJavaScriptFromConfig(user_config):
+    """Get OPTIONS string to write into JavaScript on card template.
+
+    Boolean values differ in Python ('True') VS JavaScript ('true') so they
+    need to be converted.
+    """
     return (
         "const OPTIONS = {\n"
         "    qtable: {\n"
         f"        visible: true,\n"
-        f"        colorize: {user_config['colorQuestionTable']},\n"
+        f"        colorize: {'false' if user_config['colorQuestionTable'] else 'true'},\n"
         f"        colors: {user_config['answerColoring']}\n"
         "    },\n"
         "    atable: {\n"
         f"        visible: {'false' if user_config['hideAnswerTable'] else 'true'},\n"
-        f"        colorize: {user_config['colorAnswerTable']},\n"
-        f"        colors: {user_config['answerColoring']}\n"
+        f"        colorize: {'false' if user_config['colorAnswerTable'] else 'true'},\n"
+        f"        colors: {'false' if user_config['answerColoring'] else 'true'}\n"
         "    }\n"
         "};\n"
     )
@@ -126,3 +136,44 @@ def updateTemplate(col: Collection, user_config={}):
 
     col.models.save(model)
     return model
+
+
+def getOrCreateModel():
+    model = mw.col.models.by_name(aio_model)
+    if not model:
+        # create model
+        model = addModel(mw.col)
+        return model
+    model_version = mw.col.get_config('mc_conf')['version']
+    if version.parse(model_version) < version.parse(default_conf_syncd['version']):
+        return updateTemplate(mw.col)
+    return model
+
+
+def manage_multiple_choice_note_type():
+    """Setup add-on config and templates, update if necessary"""
+    getSyncedConfig()
+    getLocalConfig()
+    getOrCreateModel()
+    if version.parse(mw.col.get_config("mc_conf")['version']) < version.parse(default_conf_syncd['version']):
+        updateSyncedConfig()
+    if version.parse(mw.pm.profile['mc_conf'].get('version', 0)) < version.parse(default_conf_syncd['version']):
+        updateLocalConfig()
+
+
+def update_multiple_choice_note_type_from_config(user_config: str):
+    """Set options according to saved user's meta.json in the addon's folder"""
+    user_config_dict = json.loads(user_config)
+    updateTemplate(mw.col, user_config_dict)
+    return user_config
+
+
+def initialize_addon():
+    from aqt.gui_hooks import (addon_config_editor_will_save_json,
+                               profile_did_open)
+
+    # Only execute addon after profile and collection are fully initialized
+    profile_did_open.append(manage_multiple_choice_note_type)
+
+    addon_config_editor_will_save_json.append(
+        update_multiple_choice_note_type_from_config)

@@ -32,47 +32,7 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
-import json
 
-from aqt import gui_hooks, mw
+from .template import initialize_addon
 
-from .config import *
-from .packaging import version
-from .template import *
-
-
-def getOrCreateModel():
-    model = mw.col.models.by_name(aio_model)
-    if not model:
-        # create model
-        model = addModel(mw.col)
-        return model
-    model_version = mw.col.get_config('mc_conf')['version']
-    if version.parse(model_version) < version.parse(default_conf_syncd['version']):
-        return updateTemplate(mw.col)
-    return model
-
-
-def manage_multiple_choice_note_type():
-    """Setup add-on config and templates, update if necessary"""
-    getSyncedConfig()
-    getLocalConfig()
-    getOrCreateModel()
-    if version.parse(mw.col.get_config("mc_conf")['version']) < version.parse(default_conf_syncd['version']):
-        updateSyncedConfig()
-    if version.parse(mw.pm.profile['mc_conf'].get('version', 0)) < version.parse(default_conf_syncd['version']):
-        updateLocalConfig()
-
-
-def update_multiple_choice_note_type_from_config(user_config: str):
-    """Set options according to saved user's meta.json in the addon's folder"""
-    user_config_dict = json.loads(user_config)
-    updateTemplate(mw.col, user_config_dict)
-    return user_config
-
-
-# Only execute addon after profile and collection are fully initialized
-gui_hooks.profile_did_open.append(manage_multiple_choice_note_type)
-
-gui_hooks.addon_config_editor_will_save_json.append(
-    update_multiple_choice_note_type_from_config)
+initialize_addon()
