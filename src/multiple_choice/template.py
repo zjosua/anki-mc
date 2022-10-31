@@ -69,7 +69,7 @@ def getOptionsJavaScriptFromConfig(user_config):
         f"        colors: {user_config['answerColoring']}\n"
         "    },\n"
         "    atable: {\n"
-        f"        visible: {'false' if user_config['hideAnswerTable'] == 'true' else 'true'},\n"
+        f"        visible: {'false' if user_config['hideAnswerTable'] else 'true'},\n"
         f"        colorize: {user_config['colorAnswerTable']},\n"
         f"        colors: {user_config['answerColoring']}\n"
         "    }\n"
