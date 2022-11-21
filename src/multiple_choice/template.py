@@ -164,5 +164,13 @@ def manage_multiple_choice_note_type():
 def update_multiple_choice_note_type_from_config(user_config: str):
     """Set options according to saved user's meta.json in the addon's folder"""
     user_config_dict = json.loads(user_config)
-    updateTemplate(mw.col, user_config_dict)
+    # Editing other add-ons' config also runs this hook.
+    # Only update if the config matches anki-mc's config.
+    if list(user_config_dict.keys()) == [
+        "answerColoring",
+        "colorAnswerTable",
+        "colorQuestionTable",
+        "hideAnswerTable",
+    ]:
+        updateTemplate(mw.col, user_config_dict)
     return user_config
