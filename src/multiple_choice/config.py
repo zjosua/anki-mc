@@ -51,8 +51,8 @@ from .packaging import version
 
 # default configurations
 # TODO: update version number before release
-default_conf_local = {'version': "2.7.2"}
-default_conf_syncd = {'version': "2.7.2"}
+default_conf_local = {"version": "2.8.0"}
+default_conf_syncd = {"version": "2.8.0"}
 
 
 def getSyncedConfig():
@@ -70,13 +70,13 @@ def updateSyncedConfig():
     for key in list(default_conf_syncd.keys()):
         if key not in mw.col.get_config("mc_conf"):
             tmp_conf[key] = default_conf_syncd[key]
-    tmp_conf['version'] = default_conf_syncd['version']
+    tmp_conf["version"] = default_conf_syncd["version"]
     mw.col.set_config("mc_conf", tmp_conf)
 
 
 def getLocalConfig():
     # Local preferences
-    if 'mc_conf' not in mw.pm.profile:
+    if "mc_conf" not in mw.pm.profile:
         mw.pm.profile["mc_conf"] = default_conf_local
 
     return mw.pm.profile["mc_conf"]
@@ -86,4 +86,4 @@ def updateLocalConfig():
     for key in list(default_conf_local.keys()):
         if key not in mw.col.get_config("mc_conf"):
             mw.pm.profile["mc_conf"][key] = default_conf_local[key]
-    mw.pm.profile['mc_conf']['version'] = default_conf_local['version']
+    mw.pm.profile["mc_conf"]["version"] = default_conf_local["version"]
