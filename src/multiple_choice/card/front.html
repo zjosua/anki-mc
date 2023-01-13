@@ -20,17 +20,30 @@
 <div class="hidden" id="Q_3">{{Q_3}}</div>
 <div class="hidden" id="Q_4">{{Q_4}}</div>
 <div class="hidden" id="Q_5">{{Q_5}}</div>
+<div class="hidden" id="Q_6">{{Q_6}}</div>
+<div class="hidden" id="Q_7">{{Q_7}}</div>
+<div class="hidden" id="Q_8">{{Q_8}}</div>
+<div class="hidden" id="Q_9">{{Q_9}}</div>
+<div class="hidden" id="Q_10">{{Q_10}}</div>
 
 <script>
     // Generate the table depending on the type.
     function generateTable() {
+        const maxQuestionsToShow = 5;
+
         var type = document.getElementById("Card_Type").innerHTML;
         var table = document.createElement("table");
         var tbody = document.createElement("tbody");
+
+        if (type == 0) {
+            tbody.innerHTML = '<tr><th>yes</th><th>no</th><th></th></tr>';
+        }
+
+        stripHtmlTagsFromSolutionString();
+
+        let solutions = getCorrectAnswers();
+        let questionTableHtmlLinesToSolution = []
         for (var i = 0; true; i++) {
-            if (type == 0 && i == 0) {
-                tbody.innerHTML = tbody.innerHTML + '<tr><th>yes</th><th>no</th><th></th></tr>';
-            }
             if (document.getElementById('Q_' + (i + 1)) != undefined) {
                 if (document.getElementById('Q_' + (i + 1)).innerHTML != '') {
                     var html = [];
@@ -57,72 +70,33 @@
                         html.push('<td>' + answerText + '</td>');
                     }
                     html.push('</tr>');
-                    tbody.innerHTML = tbody.innerHTML + html.join("");
+
+                    questionTableHtmlLinesToSolution.push({
+                        html: html.join(""),
+                        solution: solutions[i]
+                    });
                 }
             } else {
                 break;
             }
         }
+        let shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution.sort(() => Math.random() < 0.5 ? -1 : 1).slice(0, maxQuestionsToShow);
+        let shuffledHtmlLines = shuffledQuestionTableHtmlLinesToSolution.map(o => o.html).join("");
+        let shuffledSolutions = shuffledQuestionTableHtmlLinesToSolution.map(o => o.solution);
+
+        tbody.innerHTML += shuffledHtmlLines;
 
         table.appendChild(tbody);
         document.getElementById('qtable').innerHTML = table.innerHTML;
-        onShuffle();
+
+        storeCorrectAnswersInHtml(shuffledSolutions)
+
+        onCheck();  // store user answers at least once in case nothing was ticked
     }
 
-    function shuffle(array) {
-        var currentIndex = array.length, temporaryValue, randomIndex;
-
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-
-            // And swap it with the current element.
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-        }
-
-        return array;
-    }
-
-    function onShuffle() {
-        var solutions = document.getElementById("Q_solutions").innerHTML;
-        solutions = solutions.replace(/(<([^>]+)>)/gi, "").split(" ");
-        for (var i = 0; i < solutions.length; i++) {
-            solutions[i] = Number(solutions[i]);
-        }
-
-        var output = document.getElementById("output");
-
-        var qrows = document.getElementById("qtable").getElementsByTagName("tr");
-
-        var qanda = new Array();
-
-        var type = document.getElementById("Card_Type").innerHTML;
-
-        for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
-            qanda[i] = new Object();
-            qanda[i].question = qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 0].innerHTML;
-            qanda[i].answer = solutions[i];
-        }
-
-        qanda = shuffle(qanda);
-
-        var mc_solutions = new String();
-
-        for (i = 0; i < ((type == 0) ? qrows.length - 1 : qrows.length); i++) {
-            qrows[(type == 0) ? i + 1 : i].getElementsByTagName("td")[(type == 0) ? 2 : 0].innerHTML = qanda[i].question;
-            solutions[i] = qanda[i].answer;
-            mc_solutions += qanda[i].answer + " ";
-        }
-        mc_solutions = mc_solutions.substring(0, mc_solutions.lastIndexOf(" "));
-        document.getElementById("Q_solutions").innerHTML = mc_solutions;
-
-        document.getElementById("qtable").HTML = qrows;
-        onCheck();
+    function stripHtmlTagsFromSolutionString() {
+        let solutionString = document.getElementById("Q_solutions").innerHTML;
+        document.getElementById("Q_solutions").innerHTML = solutionString.replace(/(<([^>]+)>)/gi, "");
     }
 
     /**
@@ -164,10 +138,17 @@
         return userAnswers
     }
 
+    /**
+     * Get the solutions stored in the hidden div with id "Q_solutions" as Array.
+     */
     function getCorrectAnswers() {
         let solutions = document.getElementById("Q_solutions").innerHTML.split(" ").map(string => Number(string));
 
         return solutions;
+    }
+
+    function storeCorrectAnswersInHtml(solutions) {
+        document.getElementById("Q_solutions").innerHTML = solutions.join(" ");
     }
 
     /**
