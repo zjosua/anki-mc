@@ -24,6 +24,12 @@
 <script>
     // Generate the table depending on the type.
     function generateTable() {
+
+        // Options are modified according to user's meta.json in the addon's folder
+        const OPTIONS = {
+            maxQuestionsToShow: 0
+        };
+
         var type = document.getElementById("Card_Type").innerHTML;
         var table = document.createElement("table");
         var tbody = document.createElement("tbody");
@@ -73,9 +79,14 @@
                 break;
             }
         }
-        let shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution.sort(() => Math.random() < 0.5 ? -1 : 1);
-        let shuffledHtmlLines = shuffledQuestionTableHtmlLinesToSolution.map(o => o.html).join("");
-        let shuffledSolutions = shuffledQuestionTableHtmlLinesToSolution.map(o => o.solution);
+        let shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution
+            .sort(() => Math.random() < 0.5 ? -1 : 1)
+            .slice(0, OPTIONS[maxQuestionsToShow]);
+        let shuffledHtmlLines = shuffledQuestionTableHtmlLinesToSolution
+            .map(o => o.html)
+            .join("");
+        let shuffledSolutions = shuffledQuestionTableHtmlLinesToSolution
+            .map(o => o.solution);
 
         tbody.innerHTML += shuffledHtmlLines;
 

@@ -38,6 +38,7 @@ Manages note type and card templates
 
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
+from enum import Enum
 
 import json
 import re
@@ -65,13 +66,24 @@ aio_fields = {
 }
 
 
-def getOptionsJavaScriptFromConfig(user_config):
+class Template_side(Enum):
+    FRONT = 1
+    BACK = 2
+
+
+def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
     """Get OPTIONS string to write into JavaScript on card template.
 
     Boolean values differ in Python ('True') VS JavaScript ('true') so they
     need to be converted.
     """
-    return (
+
+    user_config_front_options_javascript = "\n".join([
+        "const OPTIONS = {",
+        f"    maxQuestionsToShow: {user_config['maxQuestionsToShow']}",
+        "};"
+    ]) + "\n"
+    user_config_back_options_javascript = (
         "const OPTIONS = {\n"
         "    qtable: {\n"
         f"        visible: true,\n"
@@ -85,6 +97,8 @@ def getOptionsJavaScriptFromConfig(user_config):
         "    }\n"
         "};\n"
     )
+    return (user_config_front_options_javascript if side == Template_side.FRONT
+            else user_config_back_options_javascript)
 
 
 def fillTemplateAndModelFromFile(template, model, user_config={}):
@@ -92,15 +106,22 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
     addonPath = mw.addonManager.addonsFolder() + '/' + addonFolderName + '/'
 
     if user_config:
-        options_java_script = getOptionsJavaScriptFromConfig(user_config)
+        front_options_java_script = getOptionsJavaScriptFromConfig(
+            user_config, Template_side.FRONT)
+        back_options_java_script = getOptionsJavaScriptFromConfig(
+            user_config, Template_side.BACK)
 
     with open(addonPath + 'card/front.html', encoding="utf-8") as f:
-        template['qfmt'] = f.read()
+        front_template = f.read()
+        if user_config:
+            front_template = re.sub(
+                r'const OPTIONS.*?;', front_options_java_script, front_template, 1, re.DOTALL)
+        template['qfmt'] = front_template
     with open(addonPath + 'card/back.html', encoding="utf-8") as f:
         back_template = f.read()
         if user_config:
             back_template = re.sub(
-                r'const OPTIONS.*?;', options_java_script, back_template, 1, re.DOTALL)
+                r'const OPTIONS.*?;', back_options_java_script, back_template, 1, re.DOTALL)
         template['afmt'] = back_template
     with open(addonPath + 'card/css.css', encoding="utf-8") as f:
         model['css'] = f.read()
