@@ -192,6 +192,7 @@ def update_multiple_choice_note_type_from_config(user_config: str):
         "colorAnswerTable",
         "colorQuestionTable",
         "hideAnswerTable",
+        "maxQuestionsToShow",
     ]:
         updateTemplate(mw.col, user_config_dict)
     return user_config

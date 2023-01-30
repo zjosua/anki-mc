@@ -80,8 +80,11 @@
             }
         }
         let shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution
-            .sort(() => Math.random() < 0.5 ? -1 : 1)
-            .slice(0, OPTIONS[maxQuestionsToShow]);
+            .sort(() => Math.random() < 0.5 ? -1 : 1);
+        if (OPTIONS['maxQuestionsToShow'] > 0) {
+            shuffledQuestionTableHtmlLinesToSolution = shuffledQuestionTableHtmlLinesToSolution.slice(0, OPTIONS['maxQuestionsToShow'])
+        }
+
         let shuffledHtmlLines = shuffledQuestionTableHtmlLinesToSolution
             .map(o => o.html)
             .join("");
