@@ -79,8 +79,8 @@
                 break;
             }
         }
-        let shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution
-            .sort(() => Math.random() < 0.5 ? -1 : 1);
+        let shuffledQuestionTableHtmlLinesToSolution = getShuffledQuestionTableHtmlLinesToSolution(
+            questionTableHtmlLinesToSolution, type);
         if (OPTIONS['maxQuestionsToShow'] > 0) {
             shuffledQuestionTableHtmlLinesToSolution = shuffledQuestionTableHtmlLinesToSolution.slice(0, OPTIONS['maxQuestionsToShow'])
         }
@@ -104,6 +104,22 @@
     function stripHtmlTagsFromSolutionString() {
         let solutionString = document.getElementById("Q_solutions").innerHTML;
         document.getElementById("Q_solutions").innerHTML = solutionString.replace(/(<([^>]+)>)/gi, "");
+    }
+
+    function getShuffledQuestionTableHtmlLinesToSolution(questionTableHtmlLinesToSolution, type) {
+        if (type != 1) {
+            return questionTableHtmlLinesToSolution.sort(() => Math.random() < 0.5 ? -1 : 1);
+        } else {
+            // To have the single correct answer randomly inserted into the wrong ones
+            let correctAnswer = questionTableHtmlLinesToSolution.find(o => o.solution == 1);
+            let wrongAnswers = questionTableHtmlLinesToSolution.filter(o => o.solution == 0);
+            wrongAnswers.sort(() => Math.random() < 0.5 ? -1 : 1);
+
+            let randomIndex = Math.floor(Math.random() * wrongAnswers.length);
+            wrongAnswers.splice(randomIndex, 1, correctAnswer);
+
+            return wrongAnswers;
+        }
     }
 
     /**
