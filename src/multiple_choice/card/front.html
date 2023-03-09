@@ -80,10 +80,7 @@
             }
         }
         let shuffledQuestionTableHtmlLinesToSolution = getShuffledQuestionTableHtmlLinesToSolution(
-            questionTableHtmlLinesToSolution, type);
-        if (OPTIONS['maxQuestionsToShow'] > 0) {
-            shuffledQuestionTableHtmlLinesToSolution = shuffledQuestionTableHtmlLinesToSolution.slice(0, OPTIONS['maxQuestionsToShow'])
-        }
+            questionTableHtmlLinesToSolution, type, OPTIONS['maxQuestionsToShow']);
 
         let shuffledHtmlLines = shuffledQuestionTableHtmlLinesToSolution
             .map(o => o.html)
@@ -106,17 +103,42 @@
         document.getElementById("Q_solutions").innerHTML = solutionString.replace(/(<([^>]+)>)/gi, "");
     }
 
-    function getShuffledQuestionTableHtmlLinesToSolution(questionTableHtmlLinesToSolution, type) {
+    /**
+     * Returns the shuffled and potentially reduced lines of HTML combined with their solution value
+     *
+     * In case of single choice and kprim it is guaranteed that the correct answer is shuffled in
+     * between the wrong ones.
+     *
+     * @param   {questionTableHtmlLinesToSolution}  Array[Object]   objects containing the
+     *                                                              properties 'html' and 'solution'
+     * @param   {type}                              int             Card type
+     * @param   {maxQuestionsToShow}                int             see config options
+     */
+    function getShuffledQuestionTableHtmlLinesToSolution(
+        questionTableHtmlLinesToSolution, type, maxQuestionsToShow) {
+
         if (type != 1) {
-            return questionTableHtmlLinesToSolution.sort(() => Math.random() < 0.5 ? -1 : 1);
+            shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution.sort(
+                () => Math.random() < 0.5 ? -1 : 1);
+
+            if (maxQuestionsToShow > 1) {
+                return shuffledQuestionTableHtmlLinesToSolution.slice(0, maxQuestionsToShow);
+            } else {
+                return shuffledQuestionTableHtmlLinesToSolution;
+            }
+
         } else {
             // To have the single correct answer randomly inserted into the wrong ones
             let correctAnswer = questionTableHtmlLinesToSolution.find(o => o.solution == 1);
             let wrongAnswers = questionTableHtmlLinesToSolution.filter(o => o.solution == 0);
             wrongAnswers.sort(() => Math.random() < 0.5 ? -1 : 1);
 
-            let randomIndex = Math.floor(Math.random() * wrongAnswers.length);
-            wrongAnswers.splice(randomIndex, 1, correctAnswer);
+            if (maxQuestionsToShow > 1) {
+                wrongAnswers = wrongAnswers.slice(0, maxQuestionsToShow - 1);
+            }
+
+            let randomIndex = Math.floor(Math.random() * (wrongAnswers.length + 1));
+            wrongAnswers.splice(randomIndex, 0, correctAnswer);
 
             return wrongAnswers;
         }
