@@ -225,10 +225,15 @@
     }
 
     function run() {
-        let DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
+        // for previewing the cards in "Manage Note Type..."
+        let DEFAULT_CARD_TYPE = 1;
+        let DEFAULT_SOLUTIONS = "1 0 0 0 0";
 
         if (isNaN(document.getElementById("Card_Type").innerHTML)) {
             document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
+        }
+        if (isNaN(document.getElementById("Q_solutions").innerHTML)) {
+            document.getElementById("Q_solutions").innerHTML = DEFAULT_SOLUTIONS;
         }
 
         if (document.getElementById("Card_Type").innerHTML != 0 && !isMobile()) {
