@@ -106,7 +106,7 @@
     /**
      * Returns the shuffled and potentially reduced lines of HTML combined with their solution value
      *
-     * In case of single choice and kprim it is guaranteed that the correct answer is shuffled in
+     * In case of single choice it is guaranteed that the correct answer is shuffled in
      * between the wrong ones.
      *
      * @param   {questionTableHtmlLinesToSolution}  Array[Object]   objects containing the
@@ -117,7 +117,7 @@
     function getShuffledQuestionTableHtmlLinesToSolution(
         questionTableHtmlLinesToSolution, type, maxQuestionsToShow) {
 
-        if (type != 1) {
+        if (type != 2) {
             shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution.sort(
                 () => Math.random() < 0.5 ? -1 : 1);
 
@@ -254,7 +254,7 @@
         if (isNaN(document.getElementById("Card_Type").innerHTML)) {
             document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
         }
-        if (isNaN(document.getElementById("Q_solutions").innerHTML)) {
+        if ('{' + '{Answers}' + '}' == document.getElementById("Q_solutions").innerHTML) {
             document.getElementById("Q_solutions").innerHTML = DEFAULT_SOLUTIONS;
         }
 
