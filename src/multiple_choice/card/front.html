@@ -24,6 +24,12 @@
 <script>
     // Generate the table depending on the type.
     function generateTable() {
+
+        // Options are modified according to user's meta.json in the addon's folder
+        const OPTIONS = {
+            maxQuestionsToShow: 0
+        };
+
         var type = document.getElementById("Card_Type").innerHTML;
         var table = document.createElement("table");
         var tbody = document.createElement("tbody");
@@ -73,9 +79,14 @@
                 break;
             }
         }
-        let shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution.sort(() => Math.random() < 0.5 ? -1 : 1);
-        let shuffledHtmlLines = shuffledQuestionTableHtmlLinesToSolution.map(o => o.html).join("");
-        let shuffledSolutions = shuffledQuestionTableHtmlLinesToSolution.map(o => o.solution);
+        let shuffledQuestionTableHtmlLinesToSolution = getShuffledQuestionTableHtmlLinesToSolution(
+            questionTableHtmlLinesToSolution, type, OPTIONS['maxQuestionsToShow']);
+
+        let shuffledHtmlLines = shuffledQuestionTableHtmlLinesToSolution
+            .map(o => o.html)
+            .join("");
+        let shuffledSolutions = shuffledQuestionTableHtmlLinesToSolution
+            .map(o => o.solution);
 
         tbody.innerHTML += shuffledHtmlLines;
 
@@ -90,6 +101,47 @@
     function stripHtmlTagsFromSolutionString() {
         let solutionString = document.getElementById("Q_solutions").innerHTML;
         document.getElementById("Q_solutions").innerHTML = solutionString.replace(/(<([^>]+)>)/gi, "");
+    }
+
+    /**
+     * Returns the shuffled and potentially reduced lines of HTML combined with their solution value
+     *
+     * In case of single choice it is guaranteed that the correct answer is shuffled in
+     * between the wrong ones.
+     *
+     * @param   {questionTableHtmlLinesToSolution}  Array[Object]   objects containing the
+     *                                                              properties 'html' and 'solution'
+     * @param   {type}                              int             Card type
+     * @param   {maxQuestionsToShow}                int             see config options
+     */
+    function getShuffledQuestionTableHtmlLinesToSolution(
+        questionTableHtmlLinesToSolution, type, maxQuestionsToShow) {
+
+        if (type != 2) {
+            shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution.sort(
+                () => Math.random() < 0.5 ? -1 : 1);
+
+            if (maxQuestionsToShow > 1) {
+                return shuffledQuestionTableHtmlLinesToSolution.slice(0, maxQuestionsToShow);
+            } else {
+                return shuffledQuestionTableHtmlLinesToSolution;
+            }
+
+        } else {
+            // To have the single correct answer randomly inserted into the wrong ones
+            let correctAnswer = questionTableHtmlLinesToSolution.find(o => o.solution == 1);
+            let wrongAnswers = questionTableHtmlLinesToSolution.filter(o => o.solution == 0);
+            wrongAnswers.sort(() => Math.random() < 0.5 ? -1 : 1);
+
+            if (maxQuestionsToShow > 1) {
+                wrongAnswers = wrongAnswers.slice(0, maxQuestionsToShow - 1);
+            }
+
+            let randomIndex = Math.floor(Math.random() * (wrongAnswers.length + 1));
+            wrongAnswers.splice(randomIndex, 0, correctAnswer);
+
+            return wrongAnswers;
+        }
     }
 
     /**
@@ -195,10 +247,15 @@
     }
 
     function run() {
-        let DEFAULT_CARD_TYPE = 1; // for previewing the cards in "Manage Note Type..."
+        // for previewing the cards in "Manage Note Type..."
+        let DEFAULT_CARD_TYPE = 1;
+        let DEFAULT_SOLUTIONS = "1 0 0 0 0";
 
         if (isNaN(document.getElementById("Card_Type").innerHTML)) {
             document.getElementById("Card_Type").innerHTML = DEFAULT_CARD_TYPE;
+        }
+        if ('{' + '{Answers}' + '}' == document.getElementById("Q_solutions").innerHTML) {
+            document.getElementById("Q_solutions").innerHTML = DEFAULT_SOLUTIONS;
         }
 
         if (document.getElementById("Card_Type").innerHTML != 0 && !isMobile()) {
