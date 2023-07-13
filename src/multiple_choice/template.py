@@ -128,7 +128,7 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
         model['css'] = f.read()
 
 
-def addModel(col: Collection):
+def addModel(col: Collection) -> dict[str, Any]:
     """Add add-on note type to collection"""
     models = col.models
     model = models.new(aio_model_name)
@@ -160,23 +160,23 @@ def updateTemplate(col: Collection, user_config={}):
     return model
 
 
-def getOrCreateModel():
+def AddUpdateOrGetModel() -> dict[str, Any]:
     model = mw.col.models.by_name(aio_model_name)
-    if not model:
-        # create model
-        model = addModel(mw.col)
-        return model
     model_version = mw.col.get_config('mc_conf')['version']
-    if version.parse(model_version) < version.parse(default_conf_syncd['version']):
+
+    if not model:
+        return addModel(mw.col)
+    elif version.parse(model_version) < version.parse(default_conf_syncd['version']):
         return updateTemplate(mw.col)
-    return model
+    else:
+        return model
 
 
 def manage_multiple_choice_note_type():
     """Setup add-on config and templates, update if necessary"""
     getSyncedConfig()
     getLocalConfig()
-    getOrCreateModel()
+    AddUpdateOrGetModel()
     if version.parse(mw.col.get_config("mc_conf")['version']) < version.parse(default_conf_syncd['version']):
         updateSyncedConfig()
     if version.parse(mw.pm.profile['mc_conf'].get('version', 0)) < version.parse(default_conf_syncd['version']):
@@ -217,21 +217,11 @@ def update_model(model):
 
 
 def get_front_template_text():
-    addonFolderName = mw.addonManager.addonFromModule(__name__)
-    addonPath = mw.addonManager.addonsFolder() + '/' + addonFolderName + '/'
-
-    template_text = ''
-
-    with open(addonPath + 'card/front.html', encoding="utf-8") as f:
-        template_text = f.read()
-    
-    print(template_text)
-    return template_text
+    return AddUpdateOrGetModel()['tmpls'][0]['qfmt']
 
 
 def get_front_template_with_removed_field(field: dict[str, Any], template_text: str) -> str:
     question_div = '<div class="hidden" id="question_id">{{question_id}}</div>\n'.replace(
         'question_id', field.get('name'))
 
-    print(template_text.replace(question_div, ''))
     return template_text.replace(question_div, '')
