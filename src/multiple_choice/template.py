@@ -208,6 +208,15 @@ def remove_deleted_field_from_template(dialog: fields.FieldDialog, field: dict[s
         update_model(model)
 
 
+def add_added_field_to_template(dialog: fields.FieldDialog, field: dict[str, Any]):
+    model = dialog.model
+
+    if model.get('name') == aio_model_name and re.search(r'^Q_\d$', field.get('name')):
+        set_front_template(model, get_front_template_with_added_field(
+            field, get_front_template_text()))
+        update_model(model)
+
+
 def set_front_template(model, template_text):
     model['tmpls'][0]['qfmt'] = template_text
 
@@ -225,3 +234,19 @@ def get_front_template_with_removed_field(field: dict[str, Any], template_text: 
         'question_id', field.get('name'))
 
     return template_text.replace(question_div, '')
+
+
+def get_front_template_with_added_field(field: dict[str, Any], template_text: str) -> str:
+    question_div = '<div class="hidden" id="question_id">{{question_id}}</div>'.replace(
+        'question_id', field.get('name'))
+    question_num = int(re.search(r'Q_(\d)', field.get('name')).group(1))
+
+    previous_question_text = f'<div class="hidden" id="Q_{question_num-1}">{{{{Q_{question_num-1}}}}}</div>'
+    previous_question_index = template_text.find(previous_question_text)
+
+    if previous_question_index > 0:
+        return (template_text[:previous_question_index + len(previous_question_text)] + "\n" +
+                question_div +
+                template_text[previous_question_index + len(previous_question_text):])
+    else:
+        return question_div + "\n" + template_text

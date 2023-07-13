@@ -32,11 +32,12 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
-from aqt.gui_hooks import (addon_config_editor_will_save_json,
-                           profile_did_open, fields_did_delete_field)
+from anki.buildinfo import version as anki_version
+from aqt.gui_hooks import addon_config_editor_will_save_json, profile_did_open
 
-from .template import (remove_deleted_field_from_template,
+from .template import (add_added_field_to_template,
                        manage_multiple_choice_note_type,
+                       remove_deleted_field_from_template,
                        update_multiple_choice_note_type_from_config)
 
 # Only execute addon after profile and collection are fully initialized
@@ -45,4 +46,14 @@ profile_did_open.append(manage_multiple_choice_note_type)
 addon_config_editor_will_save_json.append(
     update_multiple_choice_note_type_from_config)
 
-fields_did_delete_field.append(remove_deleted_field_from_template)
+
+def is_at_least_anki_version(major: int, minor: int, point: int):
+    return int(anki_version.split(".")[0]) >= major and int(anki_version.split(".")[1]) >= minor and int(anki_version.split(".")[2]) >= point
+
+
+if is_at_least_anki_version(2, 1, 36):
+    from aqt.gui_hooks import fields_did_delete_field
+    fields_did_delete_field.append(remove_deleted_field_from_template)
+if is_at_least_anki_version(2, 1, 66):
+    from aqt.gui_hooks import fields_did_add_field
+    fields_did_add_field.append(add_added_field_to_template)
