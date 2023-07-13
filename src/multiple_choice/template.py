@@ -38,18 +38,19 @@ Manages note type and card templates
 
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-from enum import Enum
 
 import json
 import re
+from enum import Enum
+from typing import Any
 
 from anki.consts import MODEL_STD
-from aqt import Collection, mw
+from aqt import Collection, fields, mw
 
 from .config import *
 from .packaging import version
 
-aio_model = "AllInOne (kprim, mc, sc)"
+aio_model_name = "AllInOne (kprim, mc, sc)"
 aio_card = "AllInOne (kprim, mc, sc)"
 aio_fields = {
     "question": "Question",
@@ -130,7 +131,7 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
 def addModel(col: Collection):
     """Add add-on note type to collection"""
     models = col.models
-    model = models.new(aio_model)
+    model = models.new(aio_model_name)
     model['type'] = MODEL_STD
     # Add fields:
     for i in aio_fields.keys():
@@ -149,8 +150,8 @@ def addModel(col: Collection):
 
 def updateTemplate(col: Collection, user_config={}):
     """Update add-on note templates"""
-    print(f"Updating {aio_model} note template")
-    model = col.models.by_name(aio_model)
+    print(f"Updating {aio_model_name} note template")
+    model = col.models.by_name(aio_model_name)
     template = model['tmpls'][0]
 
     fillTemplateAndModelFromFile(template, model, user_config)
@@ -160,7 +161,7 @@ def updateTemplate(col: Collection, user_config={}):
 
 
 def getOrCreateModel():
-    model = mw.col.models.by_name(aio_model)
+    model = mw.col.models.by_name(aio_model_name)
     if not model:
         # create model
         model = addModel(mw.col)
@@ -196,3 +197,41 @@ def update_multiple_choice_note_type_from_config(user_config: str):
     ]:
         updateTemplate(mw.col, user_config_dict)
     return user_config
+
+
+def remove_deleted_field_from_template(dialog: fields.FieldDialog, field: dict[str, Any]):
+    model = dialog.model
+
+    if model.get('name') == aio_model_name and re.search(r'^Q_\d$', field.get('name')):
+        set_front_template(model, get_front_template_with_removed_field(
+            field, get_front_template_text()))
+        update_model(model)
+
+
+def set_front_template(model, template_text):
+    model['tmpls'][0]['qfmt'] = template_text
+
+
+def update_model(model):
+    mw.col.models.save(model)
+
+
+def get_front_template_text():
+    addonFolderName = mw.addonManager.addonFromModule(__name__)
+    addonPath = mw.addonManager.addonsFolder() + '/' + addonFolderName + '/'
+
+    template_text = ''
+
+    with open(addonPath + 'card/front.html', encoding="utf-8") as f:
+        template_text = f.read()
+    
+    print(template_text)
+    return template_text
+
+
+def get_front_template_with_removed_field(field: dict[str, Any], template_text: str) -> str:
+    question_div = '<div class="hidden" id="question_id">{{question_id}}</div>\n'.replace(
+        'question_id', field.get('name'))
+
+    print(template_text.replace(question_div, ''))
+    return template_text.replace(question_div, '')

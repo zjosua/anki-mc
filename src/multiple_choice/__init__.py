@@ -33,14 +33,16 @@
 # Any modifications to this file must keep this entire header intact.
 
 from aqt.gui_hooks import (addon_config_editor_will_save_json,
-                           profile_did_open)
+                           profile_did_open, fields_did_delete_field)
 
-from .template import (manage_multiple_choice_note_type,
+from .template import (remove_deleted_field_from_template,
+                       manage_multiple_choice_note_type,
                        update_multiple_choice_note_type_from_config)
-
 
 # Only execute addon after profile and collection are fully initialized
 profile_did_open.append(manage_multiple_choice_note_type)
 
 addon_config_editor_will_save_json.append(
     update_multiple_choice_note_type_from_config)
+
+fields_did_delete_field.append(remove_deleted_field_from_template)
