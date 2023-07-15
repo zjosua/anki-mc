@@ -72,6 +72,13 @@ class Template_side(Enum):
     BACK = 2
 
 
+def get_json_keys(file_path: str):
+    with open(file_path, encoding="utf-8") as file:
+        data = json.load(file)
+        keys = list(data.keys())
+    return keys
+
+
 def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
     """Get OPTIONS string to write into JavaScript on card template.
 
@@ -111,6 +118,7 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
             user_config, Template_side.FRONT)
         back_options_java_script = getOptionsJavaScriptFromConfig(
             user_config, Template_side.BACK)
+        updateModelFields(model, user_config)
 
     with open(addonPath + 'card/front.html', encoding="utf-8") as f:
         front_template = f.read()
@@ -126,6 +134,10 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
         template['afmt'] = back_template
     with open(addonPath + 'card/css.css', encoding="utf-8") as f:
         model['css'] = f.read()
+
+
+def updateModelFields(model: dict[str, Any], user_config: dict[str, Any]):
+    print(model)
 
 
 def addModel(col: Collection) -> dict[str, Any]:
@@ -188,13 +200,7 @@ def update_multiple_choice_note_type_from_config(user_config: str):
     user_config_dict = json.loads(user_config)
     # Editing other add-ons' config also runs this hook.
     # Only update if the config matches anki-mc's config.
-    if list(user_config_dict.keys()) == [
-        "answerColoring",
-        "colorAnswerTable",
-        "colorQuestionTable",
-        "hideAnswerTable",
-        "maxQuestionsToShow",
-    ]:
+    if list(user_config_dict.keys()) == get_json_keys('config.json'):
         updateTemplate(mw.col, user_config_dict)
     return user_config
 
