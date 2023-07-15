@@ -33,7 +33,8 @@
 # Any modifications to this file must keep this entire header intact.
 
 from anki.buildinfo import version as anki_version
-from aqt.gui_hooks import addon_config_editor_will_save_json, profile_did_open
+from aqt.gui_hooks import (addon_config_editor_will_update_json,
+                           profile_did_open)
 
 from .packaging import version
 from .template import (add_added_field_to_template,
@@ -48,7 +49,7 @@ field_addition_hook_anki_version = version.parse('2.1.66')
 # Only execute addon after profile and collection are fully initialized
 profile_did_open.append(manage_multiple_choice_note_type)
 
-addon_config_editor_will_save_json.append(
+addon_config_editor_will_update_json.append(
     update_multiple_choice_note_type_from_config)
 
 

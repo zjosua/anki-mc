@@ -75,14 +75,6 @@ class Template_side(Enum):
     BACK = 2
 
 
-def get_json_keys_from_addon(file_path: str):
-    """Get default config from file in addon folder to compare keys with actual user config"""
-    with open(ADDON_PATH + file_path, encoding="utf-8") as file:
-        data = json.load(file)
-        keys = list(data.keys())
-    return keys
-
-
 def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
     """Get OPTIONS string to write into JavaScript on card template.
 
@@ -114,7 +106,8 @@ def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
 
 
 def fillTemplateAndModelFromFile(template, model, user_config={}):
-    print("Fill template for model:", model)
+    """Modify the referenced `model` by a user config or using the defaults instead."""
+
     if user_config:
         front_options_java_script = getOptionsJavaScriptFromConfig(
             user_config, Template_side.FRONT)
@@ -139,7 +132,7 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
 
 
 def updateModelFields(model: dict[str, Any], user_config: dict[str, Any]):
-    print("Do I have a user config? Model:", model)
+    print(user_config['maxQuestions'])
 
 
 def addModel(col: Collection) -> dict[str, Any]:
@@ -197,12 +190,12 @@ def manage_multiple_choice_note_type():
         updateLocalConfig()
 
 
-def update_multiple_choice_note_type_from_config(user_config: str):
+def update_multiple_choice_note_type_from_config(user_config: str, addon_name: str):
     """Set options according to saved user's meta.json in the addon's folder"""
+
     user_config_dict = json.loads(user_config)
-    # Editing other add-ons' config also runs this hook.
-    # Only update if the config matches anki-mc's config.
-    if list(user_config_dict.keys()) == get_json_keys_from_addon('config.json'):
+    # Updating other add-ons' config also runs the hook calling this method.
+    if addon_name == ADDON_FOLDER_NAME:
         updateTemplate(mw.col, user_config_dict)
     return user_config
 
