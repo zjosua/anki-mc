@@ -69,6 +69,8 @@ aio_fields = {
 ADDON_FOLDER_NAME = mw.addonManager.addonFromModule(__name__)
 ADDON_PATH = mw.addonManager.addonsFolder() + '/' + ADDON_FOLDER_NAME + '/'
 
+QUESTION_ID_PATTERN = r'^Q_(\d+)$'
+
 
 class Template_side(Enum):
     FRONT = 1
@@ -132,7 +134,23 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
 
 
 def updateModelFields(model: dict[str, Any], user_config: dict[str, Any]):
-    print(user_config['maxQuestions'])
+    """Only adjust the number of question fields identified by their names e.g. `Q_1`"""
+
+    model_manager = mw.col.models
+    field_names = model_manager.field_names
+    field_map = model_manager.field_map
+    question_index = model_manager.field_map.get(
+        'Q_1', {'ord': len(model_manager.field_names) - 1})['ord']
+
+    for name in field_names:
+        if re.match(QUESTION_ID_PATTERN, name) and name in field_map:
+            model_manager.remove_field(model, field_map[name])
+
+    for i in range(user_config['maxQuestions']):
+        new_question_field = model_manager.new_field(f"Q_{i + 1}")
+        new_question_field['ord'] = question_index
+        model_manager.add_field(new_question_field)
+        question_index += 1
 
 
 def addModel(col: Collection) -> dict[str, Any]:
@@ -203,7 +221,7 @@ def update_multiple_choice_note_type_from_config(user_config: str, addon_name: s
 def remove_deleted_field_from_template(dialog: fields.FieldDialog, field: dict[str, Any]):
     model = dialog.model
 
-    if model.get('name') == aio_model_name and re.search(r'^Q_\d+$', field.get('name')):
+    if model.get('name') == aio_model_name and re.search(QUESTION_ID_PATTERN, field.get('name')):
         set_front_template(model, get_front_template_with_removed_field(
             field, get_front_template_text()))
         update_model(model)
@@ -212,7 +230,7 @@ def remove_deleted_field_from_template(dialog: fields.FieldDialog, field: dict[s
 def add_added_field_to_template(dialog: fields.FieldDialog, field: dict[str, Any]):
     model = dialog.model
 
-    if model.get('name') == aio_model_name and re.search(r'^Q_\d+$', field.get('name')):
+    if model.get('name') == aio_model_name and re.search(QUESTION_ID_PATTERN, field.get('name')):
         set_front_template(model, get_front_template_with_added_field(
             field, get_front_template_text()))
         update_model(model)
@@ -240,7 +258,8 @@ def get_front_template_with_removed_field(field: dict[str, Any], template_text: 
 def get_front_template_with_added_field(field: dict[str, Any], template_text: str) -> str:
     question_div = '<div class="hidden" id="question_id">{{question_id}}</div>'.replace(
         'question_id', field.get('name'))
-    question_num = int(re.search(r'Q_(\d+)', field.get('name')).group(1))
+    question_num = int(re.search(QUESTION_ID_PATTERN,
+                       field.get('name')).group(1))
 
     previous_question_text = f'<div class="hidden" id="Q_{question_num-1}">{{{{Q_{question_num-1}}}}}</div>'
     previous_question_index = template_text.find(previous_question_text)
