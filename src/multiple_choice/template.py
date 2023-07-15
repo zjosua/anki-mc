@@ -66,14 +66,18 @@ aio_fields = {
     "extra": "Extra 1"
 }
 
+ADDON_FOLDER_NAME = mw.addonManager.addonFromModule(__name__)
+ADDON_PATH = mw.addonManager.addonsFolder() + '/' + ADDON_FOLDER_NAME + '/'
+
 
 class Template_side(Enum):
     FRONT = 1
     BACK = 2
 
 
-def get_json_keys(file_path: str):
-    with open(file_path, encoding="utf-8") as file:
+def get_json_keys_from_addon(file_path: str):
+    """Get default config from file in addon folder to compare keys with actual user config"""
+    with open(ADDON_PATH + file_path, encoding="utf-8") as file:
         data = json.load(file)
         keys = list(data.keys())
     return keys
@@ -110,9 +114,7 @@ def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
 
 
 def fillTemplateAndModelFromFile(template, model, user_config={}):
-    addonFolderName = mw.addonManager.addonFromModule(__name__)
-    addonPath = mw.addonManager.addonsFolder() + '/' + addonFolderName + '/'
-
+    print("Fill template for model:", model)
     if user_config:
         front_options_java_script = getOptionsJavaScriptFromConfig(
             user_config, Template_side.FRONT)
@@ -120,24 +122,24 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
             user_config, Template_side.BACK)
         updateModelFields(model, user_config)
 
-    with open(addonPath + 'card/front.html', encoding="utf-8") as f:
+    with open(ADDON_PATH + 'card/front.html', encoding="utf-8") as f:
         front_template = f.read()
         if user_config:
             front_template = re.sub(
                 r'const OPTIONS.*?;', front_options_java_script, front_template, 1, re.DOTALL)
         template['qfmt'] = front_template
-    with open(addonPath + 'card/back.html', encoding="utf-8") as f:
+    with open(ADDON_PATH + 'card/back.html', encoding="utf-8") as f:
         back_template = f.read()
         if user_config:
             back_template = re.sub(
                 r'const OPTIONS.*?;', back_options_java_script, back_template, 1, re.DOTALL)
         template['afmt'] = back_template
-    with open(addonPath + 'card/css.css', encoding="utf-8") as f:
+    with open(ADDON_PATH + 'card/css.css', encoding="utf-8") as f:
         model['css'] = f.read()
 
 
 def updateModelFields(model: dict[str, Any], user_config: dict[str, Any]):
-    print(model)
+    print("Do I have a user config? Model:", model)
 
 
 def addModel(col: Collection) -> dict[str, Any]:
@@ -200,7 +202,7 @@ def update_multiple_choice_note_type_from_config(user_config: str):
     user_config_dict = json.loads(user_config)
     # Editing other add-ons' config also runs this hook.
     # Only update if the config matches anki-mc's config.
-    if list(user_config_dict.keys()) == get_json_keys('config.json'):
+    if list(user_config_dict.keys()) == get_json_keys_from_addon('config.json'):
         updateTemplate(mw.col, user_config_dict)
     return user_config
 
