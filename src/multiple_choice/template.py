@@ -148,11 +148,11 @@ def adjust_number_of_question_fields(model) -> None:
         [name for name in field_names if re.match(QUESTION_ID_PATTERN, name)])
 
     if number_of_question_fields > DEFAULT_NUMBER_OF_QUESTIONS:
-        for i in range(number_of_question_fields + 1, DEFAULT_NUMBER_OF_QUESTIONS + 1):
+        for i in range(DEFAULT_NUMBER_OF_QUESTIONS + 1, number_of_question_fields + 1):
             set_front_template(model, get_front_template_with_added_field(
                 {'name': f"Q_{i}"}, get_front_template_text()))
     elif number_of_question_fields < DEFAULT_NUMBER_OF_QUESTIONS:
-        for i in range(DEFAULT_NUMBER_OF_QUESTIONS + 1, number_of_question_fields + 1):
+        for i in range(number_of_question_fields + 1, DEFAULT_NUMBER_OF_QUESTIONS + 1):
             set_front_template(model, get_front_template_with_removed_field(
                 {'name': f"Q_{i}"}, get_front_template_text()))
 

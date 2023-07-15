@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 from multiple_choice.template import (add_added_field_to_template,
                                       adjust_number_of_question_fields,
-                                      aio_model_name,
+                                      aio_model_name, get_front_template_text,
                                       get_front_template_with_added_field,
                                       get_front_template_with_removed_field,
                                       remove_deleted_field_from_template,
@@ -60,6 +60,28 @@ MODEL_QFMT_WITH_ADDED_Q9 = '''<div class="hidden" id="Q_9">{{Q_9}}</div>
 <div class="hidden" id="Q_3">{{Q_3}}</div>
 <div class="hidden" id="Q_4">{{Q_4}}</div>
 <div class="hidden" id="Q_5">{{Q_5}}</div>
+
+# Rest of the template front with some fake matches: Q_4 Q_5 <div>
+'''
+
+MODEL_QFMT_Q1_TO_Q3 = '''# Start of the template front
+
+<div class="hidden" id="Q_1">{{Q_1}}</div>
+<div class="hidden" id="Q_2">{{Q_2}}</div>
+<div class="hidden" id="Q_3">{{Q_3}}</div>
+
+# Rest of the template front with some fake matches: Q_4 Q_5 <div>
+'''
+
+MODEL_QFMT_Q1_TO_Q7 = '''# Start of the template front
+
+<div class="hidden" id="Q_1">{{Q_1}}</div>
+<div class="hidden" id="Q_2">{{Q_2}}</div>
+<div class="hidden" id="Q_3">{{Q_3}}</div>
+<div class="hidden" id="Q_4">{{Q_4}}</div>
+<div class="hidden" id="Q_5">{{Q_5}}</div>
+<div class="hidden" id="Q_6">{{Q_6}}</div>
+<div class="hidden" id="Q_7">{{Q_7}}</div>
 
 # Rest of the template front with some fake matches: Q_4 Q_5 <div>
 '''
@@ -185,7 +207,7 @@ class TestTemplateMethods(unittest.TestCase):
 
         adjust_number_of_question_fields(model)
 
-        self.assertEqual(model, get_default_model())
+        self.assertEqual(model['tmpls'][0]['qfmt'], MODEL_QFMT_Q1_TO_Q3)
 
     @patch('multiple_choice.template.mw', autospec=True)
     def test_given_too_many_question_fields_when_adjust_number_of_question_fields_is_called_then_remove_divs(self, mw):
@@ -203,7 +225,7 @@ class TestTemplateMethods(unittest.TestCase):
 
         adjust_number_of_question_fields(model)
 
-        self.assertEqual(model, get_default_model())
+        self.assertEqual(model['tmpls'][0]['qfmt'], MODEL_QFMT_Q1_TO_Q7)
 
 
 if __name__ == '__main__':
