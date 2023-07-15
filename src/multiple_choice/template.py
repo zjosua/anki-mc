@@ -67,6 +67,7 @@ aio_fields = {
 }
 
 QUESTION_ID_PATTERN = r'^Q_(\d+)$'
+DEFAULT_NUMBER_OF_QUESTIONS = 5
 
 
 class Template_side(Enum):
@@ -120,7 +121,6 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
             user_config, Template_side.FRONT)
         back_options_java_script = getOptionsJavaScriptFromConfig(
             user_config, Template_side.BACK)
-        updateModelFields(model, user_config)
 
     with open(get_addon_path() + 'card/front.html', encoding="utf-8") as f:
         front_template = f.read()
@@ -138,24 +138,23 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
         model['css'] = f.read()
 
 
-def updateModelFields(model: dict[str, Any], user_config: dict[str, Any]):
-    """Only adjust the number of question fields identified by their names e.g. `Q_1`"""
+def adjust_number_of_question_fields(model) -> None:
+    """When updating the note type this modifies the model in place to have the
+    template match the model's number of question fields."""
 
     model_manager = mw.col.models
-    field_names = model_manager.field_names
-    field_map = model_manager.field_map
-    question_index = model_manager.field_map.get(
-        'Q_1', {'ord': len(model_manager.field_names) - 1})['ord']
+    field_names = model_manager.field_names(model)
+    number_of_question_fields = len(
+        [name for name in field_names if re.match(QUESTION_ID_PATTERN, name)])
 
-    for name in field_names:
-        if re.match(QUESTION_ID_PATTERN, name) and name in field_map:
-            model_manager.remove_field(model, field_map[name])
-
-    for i in range(user_config['maxQuestions']):
-        new_question_field = model_manager.new_field(f"Q_{i + 1}")
-        new_question_field['ord'] = question_index
-        model_manager.add_field(new_question_field)
-        question_index += 1
+    if number_of_question_fields > DEFAULT_NUMBER_OF_QUESTIONS:
+        for i in range(number_of_question_fields + 1, DEFAULT_NUMBER_OF_QUESTIONS + 1):
+            set_front_template(model, get_front_template_with_added_field(
+                {'name': f"Q_{i}"}, get_front_template_text()))
+    elif number_of_question_fields < DEFAULT_NUMBER_OF_QUESTIONS:
+        for i in range(DEFAULT_NUMBER_OF_QUESTIONS + 1, number_of_question_fields + 1):
+            set_front_template(model, get_front_template_with_removed_field(
+                {'name': f"Q_{i}"}, get_front_template_text()))
 
 
 def addModel(col: Collection) -> dict[str, Any]:
@@ -185,6 +184,7 @@ def updateTemplate(col: Collection, user_config={}):
     template = model['tmpls'][0]
 
     fillTemplateAndModelFromFile(template, model, user_config)
+    adjust_number_of_question_fields(model)
 
     col.models.save(model)
     return model

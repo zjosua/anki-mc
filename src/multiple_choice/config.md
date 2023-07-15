@@ -12,8 +12,6 @@
 - `hideAnswerTable` (`bool`)
     - `true`: Only show the table with your chosen answers.
     - `false` (default): Show the table with the correct answers after confirming your chosen answers.
-- `maxQuestions` (`number`)
-    - `n`: The number of questions that may be filled with options is `n` (default is `5`)
 - `maxQuestionsToShow` (`number`)
     - `0`: (default) Show all questions that are defined in the fields on the card
     - `n >= 1`: Show only `n` questions from the ones defined in the fields on the card
