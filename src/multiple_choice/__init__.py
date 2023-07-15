@@ -35,6 +35,7 @@
 from anki.buildinfo import version as anki_version
 from aqt.gui_hooks import addon_config_editor_will_save_json, profile_did_open
 
+from .packaging import version
 from .template import (add_added_field_to_template,
                        manage_multiple_choice_note_type,
                        remove_deleted_field_from_template,
@@ -47,13 +48,9 @@ addon_config_editor_will_save_json.append(
     update_multiple_choice_note_type_from_config)
 
 
-def is_at_least_anki_version(major: int, minor: int, point: int):
-    return int(anki_version.split(".")[0]) >= major and int(anki_version.split(".")[1]) >= minor and int(anki_version.split(".")[2]) >= point
-
-
-if is_at_least_anki_version(2, 1, 36):
+if version.parse(anki_version) >= '2.1.36':
     from aqt.gui_hooks import fields_did_delete_field
     fields_did_delete_field.append(remove_deleted_field_from_template)
-if is_at_least_anki_version(2, 1, 66):
+if version.parse(anki_version) >= '2.1.66':
     from aqt.gui_hooks import fields_did_add_field
     fields_did_add_field.append(add_added_field_to_template)
