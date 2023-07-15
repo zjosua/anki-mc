@@ -202,7 +202,7 @@ def update_multiple_choice_note_type_from_config(user_config: str):
 def remove_deleted_field_from_template(dialog: fields.FieldDialog, field: dict[str, Any]):
     model = dialog.model
 
-    if model.get('name') == aio_model_name and re.search(r'^Q_\d$', field.get('name')):
+    if model.get('name') == aio_model_name and re.search(r'^Q_\d+$', field.get('name')):
         set_front_template(model, get_front_template_with_removed_field(
             field, get_front_template_text()))
         update_model(model)
