@@ -239,7 +239,7 @@ def get_front_template_with_removed_field(field: dict[str, Any], template_text: 
 def get_front_template_with_added_field(field: dict[str, Any], template_text: str) -> str:
     question_div = '<div class="hidden" id="question_id">{{question_id}}</div>'.replace(
         'question_id', field.get('name'))
-    question_num = int(re.search(r'Q_(\d)', field.get('name')).group(1))
+    question_num = int(re.search(r'Q_(\d+)', field.get('name')).group(1))
 
     previous_question_text = f'<div class="hidden" id="Q_{question_num-1}">{{{{Q_{question_num-1}}}}}</div>'
     previous_question_index = template_text.find(previous_question_text)
