@@ -62,7 +62,7 @@ If you want to change the way your answers are styled (e.g. color green what you
 
 ## License and Credits
 
-*Multiple Choice for Anki* is *Copyright © 2022 [zjosua](https://github.com/zjosua)*
+*Multiple Choice for Anki* is *Copyright © 2023 [3ter](https://github.com/3ter) and [zjosua](https://github.com/zjosua)*
 
 It is licensed under the AGPLv3.
 For more information refer to the [LICENSE](https://github.com/zjosua/anki-mc/blob/master/LICENSE) file.
@@ -81,7 +81,5 @@ Simon's and Hax's work made the multiple choice cards compatible with all platfo
 
 Volker Umpfenbach contributed a change that allows to customize how the questions and answers are colorized.
 He also provided the code to calculate and display the percentage of correctly answered items per question.
-
-Shoutout to [3ter](https://github.com/3ter) for his contributions that improve card initialization and checkbox handling.
 
 This add-on uses the [packaging](https://packaging.pypa.io/en/latest/) library.
