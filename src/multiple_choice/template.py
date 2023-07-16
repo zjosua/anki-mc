@@ -37,8 +37,7 @@
 Manages note type and card templates
 """
 
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
 import re
@@ -64,10 +63,10 @@ aio_fields = {
     "q5": "Q_5",
     "answers": "Answers",
     "sources": "Sources",
-    "extra": "Extra 1"
+    "extra": "Extra 1",
 }
 
-QUESTION_ID_PATTERN = r'^Q_(\d+)$'
+QUESTION_ID_PATTERN = r"^Q_(\d+)$"
 DEFAULT_NUMBER_OF_QUESTIONS = 5
 
 
@@ -81,7 +80,7 @@ def get_addon_name() -> str:
 
 
 def get_addon_path() -> str:
-    return mw.addonManager.addonsFolder() + '/' + get_addon_name() + '/'
+    return mw.addonManager.addonsFolder() + "/" + get_addon_name() + "/"
 
 
 def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
@@ -91,11 +90,16 @@ def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
     need to be converted.
     """
 
-    user_config_front_options_javascript = "\n".join([
-        "const OPTIONS = {",
-        f"    maxQuestionsToShow: {user_config['maxQuestionsToShow']}",
-        "};"
-    ]) + "\n"
+    user_config_front_options_javascript = (
+        "\n".join(
+            [
+                "const OPTIONS = {",
+                f"    maxQuestionsToShow: {user_config['maxQuestionsToShow']}",
+                "};",
+            ]
+        )
+        + "\n"
+    )
     user_config_back_options_javascript = (
         "const OPTIONS = {\n"
         "    qtable: {\n"
@@ -110,8 +114,11 @@ def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
         "    }\n"
         "};\n"
     )
-    return (user_config_front_options_javascript if side == Template_side.FRONT
-            else user_config_back_options_javascript)
+    return (
+        user_config_front_options_javascript
+        if side == Template_side.FRONT
+        else user_config_back_options_javascript
+    )
 
 
 def fillTemplateAndModelFromFile(template, model, user_config={}):
@@ -119,24 +126,36 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
 
     if user_config:
         front_options_java_script = getOptionsJavaScriptFromConfig(
-            user_config, Template_side.FRONT)
+            user_config, Template_side.FRONT
+        )
         back_options_java_script = getOptionsJavaScriptFromConfig(
-            user_config, Template_side.BACK)
+            user_config, Template_side.BACK
+        )
 
-    with open(get_addon_path() + 'card/front.html', encoding="utf-8") as f:
+    with open(get_addon_path() + "card/front.html", encoding="utf-8") as f:
         front_template = f.read()
         if user_config:
             front_template = re.sub(
-                r'const OPTIONS.*?;', front_options_java_script, front_template, 1, re.DOTALL)
-        template['qfmt'] = front_template
-    with open(get_addon_path() + 'card/back.html', encoding="utf-8") as f:
+                r"const OPTIONS.*?;",
+                front_options_java_script,
+                front_template,
+                1,
+                re.DOTALL,
+            )
+        template["qfmt"] = front_template
+    with open(get_addon_path() + "card/back.html", encoding="utf-8") as f:
         back_template = f.read()
         if user_config:
             back_template = re.sub(
-                r'const OPTIONS.*?;', back_options_java_script, back_template, 1, re.DOTALL)
-        template['afmt'] = back_template
-    with open(get_addon_path() + 'card/css.css', encoding="utf-8") as f:
-        model['css'] = f.read()
+                r"const OPTIONS.*?;",
+                back_options_java_script,
+                back_template,
+                1,
+                re.DOTALL,
+            )
+        template["afmt"] = back_template
+    with open(get_addon_path() + "card/css.css", encoding="utf-8") as f:
+        model["css"] = f.read()
 
 
 def adjust_number_of_question_fields(model) -> None:
@@ -146,23 +165,32 @@ def adjust_number_of_question_fields(model) -> None:
     model_manager = mw.col.models
     field_names = model_manager.field_names(model)
     number_of_question_fields = len(
-        [name for name in field_names if re.match(QUESTION_ID_PATTERN, name)])
+        [name for name in field_names if re.match(QUESTION_ID_PATTERN, name)]
+    )
 
     if number_of_question_fields > DEFAULT_NUMBER_OF_QUESTIONS:
         for i in range(DEFAULT_NUMBER_OF_QUESTIONS + 1, number_of_question_fields + 1):
-            set_front_template(model, get_front_template_with_added_field(
-                {'name': f"Q_{i}"}, get_front_template_text()))
+            set_front_template(
+                model,
+                get_front_template_with_added_field(
+                    {"name": f"Q_{i}"}, get_front_template_text()
+                ),
+            )
     elif number_of_question_fields < DEFAULT_NUMBER_OF_QUESTIONS:
         for i in range(number_of_question_fields + 1, DEFAULT_NUMBER_OF_QUESTIONS + 1):
-            set_front_template(model, get_front_template_with_removed_field(
-                {'name': f"Q_{i}"}, get_front_template_text()))
+            set_front_template(
+                model,
+                get_front_template_with_removed_field(
+                    {"name": f"Q_{i}"}, get_front_template_text()
+                ),
+            )
 
 
 def addModel(col: Collection) -> dict[str, Any]:
     """Add add-on note type to collection"""
     models = col.models
     model = models.new(aio_model_name)
-    model['type'] = MODEL_STD
+    model["type"] = MODEL_STD
     # Add fields:
     for i in aio_fields.keys():
         fld = models.new_field(aio_fields[i])
@@ -172,7 +200,7 @@ def addModel(col: Collection) -> dict[str, Any]:
 
     fillTemplateAndModelFromFile(template, model)
 
-    model['sortf'] = 0  # set sortfield to question
+    model["sortf"] = 0  # set sortfield to question
     models.add_template(model, template)
     models.add(model)
     return model
@@ -182,7 +210,7 @@ def updateTemplate(col: Collection, user_config={}):
     """Update add-on note templates"""
     print(f"Updating {aio_model_name} note template")
     model = col.models.by_name(aio_model_name)
-    template = model['tmpls'][0]
+    template = model["tmpls"][0]
 
     fillTemplateAndModelFromFile(template, model, user_config)
     adjust_number_of_question_fields(model)
@@ -193,11 +221,11 @@ def updateTemplate(col: Collection, user_config={}):
 
 def AddUpdateOrGetModel() -> dict[str, Any]:
     model = mw.col.models.by_name(aio_model_name)
-    model_version = mw.col.get_config('mc_conf')['version']
+    model_version = mw.col.get_config("mc_conf")["version"]
 
     if not model:
         return addModel(mw.col)
-    elif version.parse(model_version) < version.parse(default_conf_syncd['version']):
+    elif version.parse(model_version) < version.parse(default_conf_syncd["version"]):
         return updateTemplate(mw.col)
     else:
         return model
@@ -208,9 +236,13 @@ def manage_multiple_choice_note_type():
     getSyncedConfig()
     getLocalConfig()
     AddUpdateOrGetModel()
-    if version.parse(mw.col.get_config("mc_conf")['version']) < version.parse(default_conf_syncd['version']):
+    if version.parse(mw.col.get_config("mc_conf")["version"]) < version.parse(
+        default_conf_syncd["version"]
+    ):
         updateSyncedConfig()
-    if version.parse(mw.pm.profile['mc_conf'].get('version', 0)) < version.parse(default_conf_syncd['version']):
+    if version.parse(mw.pm.profile["mc_conf"].get("version", 0)) < version.parse(
+        default_conf_syncd["version"]
+    ):
         updateLocalConfig()
 
 
@@ -224,26 +256,35 @@ def update_multiple_choice_note_type_from_config(user_config: str, addon_name: s
     return user_config
 
 
-def remove_deleted_field_from_template(dialog: fields.FieldDialog, field: dict[str, Any]):
+def remove_deleted_field_from_template(
+    dialog: fields.FieldDialog, field: dict[str, Any]
+):
     model = dialog.model
 
-    if model.get('name') == aio_model_name and re.search(QUESTION_ID_PATTERN, field.get('name')):
-        set_front_template(model, get_front_template_with_removed_field(
-            field, get_front_template_text()))
+    if model.get("name") == aio_model_name and re.search(
+        QUESTION_ID_PATTERN, field.get("name")
+    ):
+        set_front_template(
+            model,
+            get_front_template_with_removed_field(field, get_front_template_text()),
+        )
         update_model(model)
 
 
 def add_added_field_to_template(dialog: fields.FieldDialog, field: dict[str, Any]):
     model = dialog.model
 
-    if model.get('name') == aio_model_name and re.search(QUESTION_ID_PATTERN, field.get('name')):
-        set_front_template(model, get_front_template_with_added_field(
-            field, get_front_template_text()))
+    if model.get("name") == aio_model_name and re.search(
+        QUESTION_ID_PATTERN, field.get("name")
+    ):
+        set_front_template(
+            model, get_front_template_with_added_field(field, get_front_template_text())
+        )
         update_model(model)
 
 
 def set_front_template(model, template_text):
-    model['tmpls'][0]['qfmt'] = template_text
+    model["tmpls"][0]["qfmt"] = template_text
 
 
 def update_model(model):
@@ -251,28 +292,40 @@ def update_model(model):
 
 
 def get_front_template_text():
-    return AddUpdateOrGetModel()['tmpls'][0]['qfmt']
+    return AddUpdateOrGetModel()["tmpls"][0]["qfmt"]
 
 
-def get_front_template_with_removed_field(field: dict[str, Any], template_text: str) -> str:
-    question_div = '<div class="hidden" id="question_id">{{question_id}}</div>\n'.replace(
-        'question_id', field.get('name'))
+def get_front_template_with_removed_field(
+    field: dict[str, Any], template_text: str
+) -> str:
+    question_div = (
+        '<div class="hidden" id="question_id">{{question_id}}</div>\n'.replace(
+            "question_id", field.get("name")
+        )
+    )
 
-    return template_text.replace(question_div, '')
+    return template_text.replace(question_div, "")
 
 
-def get_front_template_with_added_field(field: dict[str, Any], template_text: str) -> str:
+def get_front_template_with_added_field(
+    field: dict[str, Any], template_text: str
+) -> str:
     question_div = '<div class="hidden" id="question_id">{{question_id}}</div>'.replace(
-        'question_id', field.get('name'))
-    question_num = int(re.search(QUESTION_ID_PATTERN,
-                       field.get('name')).group(1))
+        "question_id", field.get("name")
+    )
+    question_num = int(re.search(QUESTION_ID_PATTERN, field.get("name")).group(1))
 
-    previous_question_text = f'<div class="hidden" id="Q_{question_num-1}">{{{{Q_{question_num-1}}}}}</div>'
+    previous_question_text = (
+        f'<div class="hidden" id="Q_{question_num-1}">{{{{Q_{question_num-1}}}}}</div>'
+    )
     previous_question_index = template_text.find(previous_question_text)
 
     if previous_question_index > 0:
-        return (template_text[:previous_question_index + len(previous_question_text)] + "\n" +
-                question_div +
-                template_text[previous_question_index + len(previous_question_text):])
+        return (
+            template_text[: previous_question_index + len(previous_question_text)]
+            + "\n"
+            + question_div
+            + template_text[previous_question_index + len(previous_question_text) :]
+        )
     else:
         return question_div + "\n" + template_text
