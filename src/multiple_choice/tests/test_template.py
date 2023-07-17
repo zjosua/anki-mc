@@ -19,16 +19,15 @@ import unittest
 from typing import Any
 from unittest.mock import MagicMock, patch
 
-from multiple_choice.template import (
-    add_added_field_to_template,
-    adjust_number_of_question_fields,
-    aio_model_name,
-    get_front_template_text,
-    get_front_template_with_added_field,
-    get_front_template_with_removed_field,
-    remove_deleted_field_from_template,
-    set_front_template,
-)
+from multiple_choice.template import (add_added_field_to_template,
+                                      adjust_number_of_question_fields,
+                                      aio_model_name, get_addon_path,
+                                      get_front_template_text,
+                                      get_front_template_with_added_field,
+                                      get_front_template_with_removed_field,
+                                      manage_multiple_choice_note_type,
+                                      remove_deleted_field_from_template,
+                                      set_front_template)
 
 MODEL_QFMT = """# Start of the template front
 
@@ -112,17 +111,36 @@ def get_default_model() -> dict[str, Any]:
 
 
 class TestTemplateMethods(unittest.TestCase):
-    @patch("multiple_choice.template.update_model")
-    @patch("multiple_choice.template.get_front_template_with_removed_field")
-    @patch("multiple_choice.template.get_front_template_text")
-    @patch("multiple_choice.template.fields.FieldDialog")
-    def test_when_remove_deleted_field_from_template_is_called_then_calls_correct_methods(
-        self,
-        field_dialog,
-        get_front_template_text: MagicMock,
-        get_front_template_with_removed_field: MagicMock,
-        update_model: MagicMock,
-    ):
+
+    @patch('multiple_choice.template.mw', autospec=True)
+    @patch('multiple_choice.config.mw', autospec=True)
+    @patch('multiple_choice.template.get_addon_path')
+    def test_given_new_addon_version_when_manage_multiple_choice_note_type_is_called_then_addon_loads_without_exceptions(self, get_addon_path: MagicMock, mw_from_config, mw_from_template):
+        """As we have no `main window` (mw), everything needs to be mocked."""
+        model_manager = MagicMock()
+        model_manager.field_names.return_value = ['Question',
+                                                  'Title', 'Q_1', 'Q_2', 'Q_3', 'Q_4', 'Q_5', 'Q_6', 'Q_7', 'Extra 1']
+        model = get_default_model()
+        old_version = {'version': '1.0.0'}
+
+        for mw in [mw_from_template, mw_from_config]:
+            mw.col.models = model_manager
+            mw.col.models.by_name.return_value = model
+            mw.col.get_config.return_value = old_version
+
+        get_addon_path.return_value = 'src/multiple_choice/'
+
+        manage_multiple_choice_note_type()
+
+    @patch('multiple_choice.template.update_model')
+    @patch('multiple_choice.template.get_front_template_with_removed_field')
+    @patch('multiple_choice.template.get_front_template_text')
+    @patch('multiple_choice.template.fields.FieldDialog')
+    def test_when_remove_deleted_field_from_template_is_called_then_calls_correct_methods(self,
+                                                                                          field_dialog,
+                                                                                          get_front_template_text: MagicMock,
+                                                                                          get_front_template_with_removed_field: MagicMock,
+                                                                                          update_model: MagicMock):
         field_dialog.model = get_default_model()
         get_front_template_text.return_value = MODEL_QFMT
 
