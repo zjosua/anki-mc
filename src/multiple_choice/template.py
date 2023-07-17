@@ -219,26 +219,26 @@ def updateTemplate(col: Collection, user_config={}):
     return model
 
 
-def AddUpdateOrGetModel() -> dict[str, Any]:
+def AddOrUpdateModel():
     model = mw.col.models.by_name(aio_model_name)
     model_version = mw.col.get_config("mc_conf")["version"]
 
     if not model:
-        return addModel(mw.col)
-    elif version.parse(model_version) < version.parse(default_conf_syncd["version"]):
-        return updateTemplate(mw.col)
-    else:
-        return model
+        addModel(mw.col)
+    elif version.parse(model_version) < version.parse(default_conf_syncd['version']):
+        updateTemplate(mw.col)
+
+
+def get_model() -> dict[str, Any]:
+    return mw.col.models.by_name(aio_model_name)
 
 
 def manage_multiple_choice_note_type():
     """Setup add-on config and templates, update if necessary"""
     getSyncedConfig()
     getLocalConfig()
-    AddUpdateOrGetModel()
-    if version.parse(mw.col.get_config("mc_conf")["version"]) < version.parse(
-        default_conf_syncd["version"]
-    ):
+    AddOrUpdateModel()
+    if version.parse(mw.col.get_config("mc_conf")['version']) < version.parse(default_conf_syncd['version']):
         updateSyncedConfig()
     if version.parse(mw.pm.profile["mc_conf"].get("version", 0)) < version.parse(
         default_conf_syncd["version"]
@@ -292,7 +292,7 @@ def update_model(model):
 
 
 def get_front_template_text():
-    return AddUpdateOrGetModel()["tmpls"][0]["qfmt"]
+    return get_model()['tmpls'][0]['qfmt']
 
 
 def get_front_template_with_removed_field(

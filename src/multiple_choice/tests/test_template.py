@@ -127,6 +127,7 @@ class TestTemplateMethods(unittest.TestCase):
             mw.col.models = model_manager
             mw.col.models.by_name.return_value = model
             mw.col.get_config.return_value = old_version
+            mw.pm.profile = {'mc_conf': old_version}
 
         get_addon_path.return_value = 'src/multiple_choice/'
 
