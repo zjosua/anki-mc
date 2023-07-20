@@ -225,7 +225,7 @@ def AddOrUpdateModel():
 
     if not model:
         addModel(mw.col)
-    elif version.parse(model_version) < version.parse(default_conf_syncd['version']):
+    elif version.parse(model_version) < version.parse(default_conf_syncd["version"]):
         updateTemplate(mw.col)
 
 
@@ -238,7 +238,9 @@ def manage_multiple_choice_note_type():
     getSyncedConfig()
     getLocalConfig()
     AddOrUpdateModel()
-    if version.parse(mw.col.get_config("mc_conf")['version']) < version.parse(default_conf_syncd['version']):
+    if version.parse(mw.col.get_config("mc_conf")["version"]) < version.parse(
+        default_conf_syncd["version"]
+    ):
         updateSyncedConfig()
     if version.parse(mw.pm.profile["mc_conf"].get("version", 0)) < version.parse(
         default_conf_syncd["version"]
@@ -292,7 +294,7 @@ def update_model(model):
 
 
 def get_front_template_text():
-    return get_model()['tmpls'][0]['qfmt']
+    return get_model()["tmpls"][0]["qfmt"]
 
 
 def get_front_template_with_removed_field(
