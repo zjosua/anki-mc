@@ -348,6 +348,43 @@ class TestTemplateMethods(unittest.TestCase):
 
         self.assertEqual(model["tmpls"][0]["qfmt"], MODEL_QFMT_Q1_TO_Q7)
 
+    @patch("multiple_choice.template.mw", autospec=True)
+    @patch("multiple_choice.template.get_model_front_template_text")
+    def test_given_certain_fields_when_adjust_number_of_question_fields_is_called_then_no_changes_and_no_errors(
+        self, get_model_front_template_text: MagicMock, mw
+    ):
+        self.maxDiff = None
+
+        model_manager = MagicMock()
+        model_manager.field_names.return_value = [
+            "Note ID",
+            "Image",
+            "Question",
+            "QType (0=kprim,1=mc,2=sc)",
+            "Q_1",
+            "Q_2",
+            "Q_3",
+            "Answers",
+            "Sources",
+        ]
+
+        front_template = ""
+        with open(
+            "src/multiple_choice/tests/github-issue-113-front.html", encoding="utf-8"
+        ) as f:
+            front_template = f.read()
+
+        get_model_front_template_text.return_value = front_template
+        model = get_default_model(front_template)
+
+        mw.col.models = model_manager
+        mw.col.models.by_name.return_value = model
+        mw.col.get_config.return_value = {"version": "9.9.9"}
+
+        adjust_number_of_question_fields(model)
+
+        self.assertEqual(model["tmpls"][0]["qfmt"], front_template)
+
 
 if __name__ == "__main__":
     unittest.main()
