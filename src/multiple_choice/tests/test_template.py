@@ -23,7 +23,6 @@ from multiple_choice.template import (
     add_added_field_to_template,
     adjust_number_of_question_fields,
     aio_model_name,
-    get_default_front_template_text,
     get_front_template_with_added_field,
     get_front_template_with_removed_field,
     manage_multiple_choice_note_type,

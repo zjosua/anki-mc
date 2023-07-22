@@ -122,7 +122,7 @@ def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
     )
 
 
-def fillTemplateAndModelFromFile(template, model, user_config={}):
+def fillTemplateAndModelFromFile(model, user_config={}):
     """Modify the referenced `model` by a user config or using the defaults instead."""
 
     if user_config:
@@ -142,7 +142,7 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
             1,
             re.DOTALL,
         )
-    template["qfmt"] = front_template
+    set_front_template(model, front_template)
 
     back_template = get_default_back_template_text()
     if user_config:
@@ -153,7 +153,7 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
             1,
             re.DOTALL,
         )
-    template["afmt"] = back_template
+    set_back_template(model, back_template)
 
     model["css"] = get_default_css_template_text()
 
@@ -168,22 +168,22 @@ def adjust_number_of_question_fields(model) -> None:
         [name for name in field_names if re.match(QUESTION_ID_PATTERN, name)]
     )
 
-    adjusted_front_template = get_default_front_template_text()
     if number_of_question_fields > DEFAULT_NUMBER_OF_QUESTIONS:
         for i in range(DEFAULT_NUMBER_OF_QUESTIONS + 1, number_of_question_fields + 1):
-            adjusted_front_template = get_front_template_with_added_field(
-                {"name": f"Q_{i}"}, adjusted_front_template
+            set_front_template(
+                model,
+                get_front_template_with_added_field(
+                    {"name": f"Q_{i}"}, get_model_front_template_text(model)
+                ),
             )
     elif number_of_question_fields < DEFAULT_NUMBER_OF_QUESTIONS:
         for i in range(number_of_question_fields + 1, DEFAULT_NUMBER_OF_QUESTIONS + 1):
-            adjusted_front_template = get_front_template_with_removed_field(
-                {"name": f"Q_{i}"}, adjusted_front_template
+            set_front_template(
+                model,
+                get_front_template_with_removed_field(
+                    {"name": f"Q_{i}"}, get_model_front_template_text(model)
+                ),
             )
-
-    set_front_template(
-        model,
-        adjusted_front_template,
-    )
 
 
 def addModel(col: Collection) -> dict[str, Any]:
@@ -198,7 +198,7 @@ def addModel(col: Collection) -> dict[str, Any]:
     # Add template
     template = models.new_template(aio_card)
 
-    fillTemplateAndModelFromFile(template, model)
+    fillTemplateAndModelFromFile(model)
 
     model["sortf"] = 0  # set sortfield to question
     models.add_template(model, template)
@@ -212,7 +212,7 @@ def updateTemplate(col: Collection, user_config={}):
     model = col.models.by_name(aio_model_name)
     template = model["tmpls"][0]
 
-    fillTemplateAndModelFromFile(template, model, user_config)
+    fillTemplateAndModelFromFile(model, user_config)
     adjust_number_of_question_fields(model)
 
     col.models.save(model)
@@ -296,12 +296,18 @@ def set_front_template(model, template_text):
     model["tmpls"][0]["qfmt"] = template_text
 
 
+def set_back_template(model, template_text):
+    model["tmpls"][0]["afmt"] = template_text
+
+
 def update_model(model):
     mw.col.models.save(model)
 
 
-def get_model_front_template_text() -> str:
-    return get_model()["tmpls"][0]["qfmt"]
+def get_model_front_template_text(model: dict[str, Any] = None) -> str:
+    if model is None:
+        model = get_model()
+    return model["tmpls"][0]["qfmt"]
 
 
 @cache
