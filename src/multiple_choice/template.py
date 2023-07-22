@@ -42,6 +42,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import re
 from enum import Enum
+from functools import cache
 from typing import Any
 
 from anki.consts import MODEL_STD
@@ -132,30 +133,29 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
             user_config, Template_side.BACK
         )
 
-    with open(get_addon_path() + "card/front.html", encoding="utf-8") as f:
-        front_template = f.read()
-        if user_config:
-            front_template = re.sub(
-                r"const OPTIONS.*?;",
-                front_options_java_script,
-                front_template,
-                1,
-                re.DOTALL,
-            )
-        template["qfmt"] = front_template
-    with open(get_addon_path() + "card/back.html", encoding="utf-8") as f:
-        back_template = f.read()
-        if user_config:
-            back_template = re.sub(
-                r"const OPTIONS.*?;",
-                back_options_java_script,
-                back_template,
-                1,
-                re.DOTALL,
-            )
-        template["afmt"] = back_template
-    with open(get_addon_path() + "card/css.css", encoding="utf-8") as f:
-        model["css"] = f.read()
+    front_template = get_default_front_template_text()
+    if user_config:
+        front_template = re.sub(
+            r"const OPTIONS.*?;",
+            front_options_java_script,
+            front_template,
+            1,
+            re.DOTALL,
+        )
+    template["qfmt"] = front_template
+
+    back_template = get_default_back_template_text()
+    if user_config:
+        back_template = re.sub(
+            r"const OPTIONS.*?;",
+            back_options_java_script,
+            back_template,
+            1,
+            re.DOTALL,
+        )
+    template["afmt"] = back_template
+
+    model["css"] = get_default_css_template_text()
 
 
 def adjust_number_of_question_fields(model) -> None:
@@ -168,22 +168,22 @@ def adjust_number_of_question_fields(model) -> None:
         [name for name in field_names if re.match(QUESTION_ID_PATTERN, name)]
     )
 
+    adjusted_front_template = get_default_front_template_text()
     if number_of_question_fields > DEFAULT_NUMBER_OF_QUESTIONS:
         for i in range(DEFAULT_NUMBER_OF_QUESTIONS + 1, number_of_question_fields + 1):
-            set_front_template(
-                model,
-                get_front_template_with_added_field(
-                    {"name": f"Q_{i}"}, get_front_template_text()
-                ),
+            adjusted_front_template = get_front_template_with_added_field(
+                {"name": f"Q_{i}"}, adjusted_front_template
             )
     elif number_of_question_fields < DEFAULT_NUMBER_OF_QUESTIONS:
         for i in range(number_of_question_fields + 1, DEFAULT_NUMBER_OF_QUESTIONS + 1):
-            set_front_template(
-                model,
-                get_front_template_with_removed_field(
-                    {"name": f"Q_{i}"}, get_front_template_text()
-                ),
+            adjusted_front_template = get_front_template_with_removed_field(
+                {"name": f"Q_{i}"}, adjusted_front_template
             )
+
+    set_front_template(
+        model,
+        adjusted_front_template,
+    )
 
 
 def addModel(col: Collection) -> dict[str, Any]:
@@ -261,6 +261,8 @@ def update_multiple_choice_note_type_from_config(user_config: str, addon_name: s
 def remove_deleted_field_from_template(
     dialog: fields.FieldDialog, field: dict[str, Any]
 ):
+    """As this is called while using the addon this doesn't overwrite the
+    potentially user-modified template with the default"""
     model = dialog.model
 
     if model.get("name") == aio_model_name and re.search(
@@ -268,19 +270,24 @@ def remove_deleted_field_from_template(
     ):
         set_front_template(
             model,
-            get_front_template_with_removed_field(field, get_front_template_text()),
+            get_front_template_with_removed_field(
+                field, get_model_front_template_text()
+            ),
         )
         update_model(model)
 
 
 def add_added_field_to_template(dialog: fields.FieldDialog, field: dict[str, Any]):
+    """As this is called while using the addon this doesn't overwrite the
+    potentially user-modified template with the default"""
     model = dialog.model
 
     if model.get("name") == aio_model_name and re.search(
         QUESTION_ID_PATTERN, field.get("name")
     ):
         set_front_template(
-            model, get_front_template_with_added_field(field, get_front_template_text())
+            model,
+            get_front_template_with_added_field(field, get_model_front_template_text()),
         )
         update_model(model)
 
@@ -293,8 +300,26 @@ def update_model(model):
     mw.col.models.save(model)
 
 
-def get_front_template_text():
+def get_model_front_template_text() -> str:
     return get_model()["tmpls"][0]["qfmt"]
+
+
+@cache
+def get_default_front_template_text() -> str:
+    with open(get_addon_path() + "card/front.html", encoding="utf-8") as f:
+        return f.read()
+
+
+@cache
+def get_default_back_template_text() -> str:
+    with open(get_addon_path() + "card/back.html", encoding="utf-8") as f:
+        return f.read()
+
+
+@cache
+def get_default_css_template_text() -> str:
+    with open(get_addon_path() + "card/css.css", encoding="utf-8") as f:
+        return f.read()
 
 
 def get_front_template_with_removed_field(
