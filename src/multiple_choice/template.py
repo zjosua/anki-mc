@@ -168,6 +168,8 @@ def adjust_number_of_question_fields(model) -> None:
         [name for name in field_names if re.match(QUESTION_ID_PATTERN, name)]
     )
 
+    add_missing_fields(model, field_names)
+
     if number_of_question_fields > DEFAULT_NUMBER_OF_QUESTIONS:
         for i in range(DEFAULT_NUMBER_OF_QUESTIONS + 1, number_of_question_fields + 1):
             set_front_template(
@@ -191,10 +193,9 @@ def addModel(col: Collection) -> dict[str, Any]:
     models = col.models
     model = models.new(aio_model_name)
     model["type"] = MODEL_STD
-    # Add fields:
-    for i in aio_fields.keys():
-        fld = models.new_field(aio_fields[i])
-        models.add_field(model, fld)
+
+    add_fields(models, model)
+
     # Add template
     template = models.new_template(aio_card)
 
@@ -206,11 +207,27 @@ def addModel(col: Collection) -> dict[str, Any]:
     return model
 
 
+def add_fields(models, model):
+    for i in aio_fields.keys():
+        fld = models.new_field(aio_fields[i])
+        models.add_field(model, fld)
+
+
+def add_missing_fields(model, current_field_names: list[str]):
+    models = mw.col.models
+
+    for default_field_name in filter(
+        lambda n: not re.match(QUESTION_ID_PATTERN, n), aio_fields.values()
+    ):
+        if default_field_name not in current_field_names:
+            fld = models.new_field(default_field_name)
+            models.add_field(model, fld)
+
+
 def updateTemplate(col: Collection, user_config={}):
     """Update add-on note templates"""
     print(f"Updating {aio_model_name} note template")
     model = col.models.by_name(aio_model_name)
-    template = model["tmpls"][0]
 
     fillTemplateAndModelFromFile(model, user_config)
     adjust_number_of_question_fields(model)

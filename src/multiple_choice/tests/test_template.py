@@ -17,10 +17,11 @@
 
 import unittest
 from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 from multiple_choice.template import (
     add_added_field_to_template,
+    add_missing_fields,
     adjust_number_of_question_fields,
     aio_model_name,
     get_front_template_with_added_field,
@@ -106,15 +107,17 @@ MODEL_QFMT_Q1_TO_Q7 = """# Start of the template front
 # Rest of the template front with some fake matches: Q_4 Q_5 <div>
 """
 
-MODEL_QFMT_PARTIAL_Q1_TO_Q3 = """# Start of the template front
-<div class="hidden" id="Q_1">{{Q_1}}</div>
-<div class="hidden" id="Q_2">{{Q_2}}</div>
-<div class="hidden" id="Q_3">{{Q_3}}</div>
-<div class="hidden" id="Q_4"></div>
-<div class="hidden" id="Q_5"></div>
-
-# Rest of the template front with some fake matches: Q_4 Q_5 <div>
-"""
+FIELDS_WITH_MISSING_DEFAULT_TITLE = [
+    "Note ID",
+    "Image",
+    "Question",
+    "QType (0=kprim,1=mc,2=sc)",
+    "Q_1",
+    "Q_2",
+    "Q_3",
+    "Answers",
+    "Sources",
+]
 
 
 def get_default_model(qfmt=MODEL_QFMT) -> dict[str, Any]:
@@ -349,41 +352,18 @@ class TestTemplateMethods(unittest.TestCase):
         self.assertEqual(model["tmpls"][0]["qfmt"], MODEL_QFMT_Q1_TO_Q7)
 
     @patch("multiple_choice.template.mw", autospec=True)
-    @patch("multiple_choice.template.get_model_front_template_text")
-    def test_given_certain_fields_when_adjust_number_of_question_fields_is_called_then_no_changes_and_no_errors(
-        self, get_model_front_template_text: MagicMock, mw
-    ):
-        self.maxDiff = None
+    def test_when_add_missing_fields_then_add_correctly(self, mw):
+        new_field_mock = MagicMock()
+        add_field_mock = MagicMock()
+        mw.col.models.new_field = new_field_mock
+        mw.col.models.add_field = add_field_mock
 
-        model_manager = MagicMock()
-        model_manager.field_names.return_value = [
-            "Note ID",
-            "Image",
-            "Question",
-            "QType (0=kprim,1=mc,2=sc)",
-            "Q_1",
-            "Q_2",
-            "Q_3",
-            "Answers",
-            "Sources",
-        ]
+        model = get_default_model()
+        current_field_names = FIELDS_WITH_MISSING_DEFAULT_TITLE
 
-        front_template = ""
-        with open(
-            "src/multiple_choice/tests/github-issue-113-front.html", encoding="utf-8"
-        ) as f:
-            front_template = f.read()
+        add_missing_fields(model, current_field_names)
 
-        get_model_front_template_text.return_value = front_template
-        model = get_default_model(front_template)
-
-        mw.col.models = model_manager
-        mw.col.models.by_name.return_value = model
-        mw.col.get_config.return_value = {"version": "9.9.9"}
-
-        adjust_number_of_question_fields(model)
-
-        self.assertEqual(model["tmpls"][0]["qfmt"], front_template)
+        new_field_mock.assert_has_calls([call("Title"), call("Extra 1")])
 
 
 if __name__ == "__main__":
