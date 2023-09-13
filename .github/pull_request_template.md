@@ -3,7 +3,7 @@
 *Provide concise summary of your change.*
 
 #### Checklist
-- [ ] I've read the [contribution guideline](./docs/contributing.md)
+- [ ] I've read the [contribution guideline](https://github.com/zjosua/anki-mc/blob/master/docs/contributing.md)
 - [ ] I've tested my change with the following Anki version:
 - [ ] I've tested my change on the following operating system(s):
 - [ ] If the change is related to an issue, a commit message or the above description references the issue
