@@ -42,6 +42,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import re
 from enum import Enum
+from functools import cache
 from typing import Any
 
 from anki.consts import MODEL_STD
@@ -121,7 +122,7 @@ def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
     )
 
 
-def fillTemplateAndModelFromFile(template, model, user_config={}):
+def fillTemplateAndModelFromFile(model, user_config={}):
     """Modify the referenced `model` by a user config or using the defaults instead."""
 
     if user_config:
@@ -132,30 +133,29 @@ def fillTemplateAndModelFromFile(template, model, user_config={}):
             user_config, Template_side.BACK
         )
 
-    with open(get_addon_path() + "card/front.html", encoding="utf-8") as f:
-        front_template = f.read()
-        if user_config:
-            front_template = re.sub(
-                r"const OPTIONS.*?;",
-                front_options_java_script,
-                front_template,
-                1,
-                re.DOTALL,
-            )
-        template["qfmt"] = front_template
-    with open(get_addon_path() + "card/back.html", encoding="utf-8") as f:
-        back_template = f.read()
-        if user_config:
-            back_template = re.sub(
-                r"const OPTIONS.*?;",
-                back_options_java_script,
-                back_template,
-                1,
-                re.DOTALL,
-            )
-        template["afmt"] = back_template
-    with open(get_addon_path() + "card/css.css", encoding="utf-8") as f:
-        model["css"] = f.read()
+    front_template = get_default_front_template_text()
+    if user_config:
+        front_template = re.sub(
+            r"const OPTIONS.*?;",
+            front_options_java_script,
+            front_template,
+            1,
+            re.DOTALL,
+        )
+    set_front_template(model, front_template)
+
+    back_template = get_default_back_template_text()
+    if user_config:
+        back_template = re.sub(
+            r"const OPTIONS.*?;",
+            back_options_java_script,
+            back_template,
+            1,
+            re.DOTALL,
+        )
+    set_back_template(model, back_template)
+
+    model["css"] = get_default_css_template_text()
 
 
 def adjust_number_of_question_fields(model) -> None:
@@ -168,12 +168,14 @@ def adjust_number_of_question_fields(model) -> None:
         [name for name in field_names if re.match(QUESTION_ID_PATTERN, name)]
     )
 
+    add_missing_fields(model, field_names)
+
     if number_of_question_fields > DEFAULT_NUMBER_OF_QUESTIONS:
         for i in range(DEFAULT_NUMBER_OF_QUESTIONS + 1, number_of_question_fields + 1):
             set_front_template(
                 model,
                 get_front_template_with_added_field(
-                    {"name": f"Q_{i}"}, get_front_template_text()
+                    {"name": f"Q_{i}"}, get_model_front_template_text(model)
                 ),
             )
     elif number_of_question_fields < DEFAULT_NUMBER_OF_QUESTIONS:
@@ -181,7 +183,7 @@ def adjust_number_of_question_fields(model) -> None:
             set_front_template(
                 model,
                 get_front_template_with_removed_field(
-                    {"name": f"Q_{i}"}, get_front_template_text()
+                    {"name": f"Q_{i}"}, get_model_front_template_text(model)
                 ),
             )
 
@@ -191,14 +193,13 @@ def addModel(col: Collection) -> dict[str, Any]:
     models = col.models
     model = models.new(aio_model_name)
     model["type"] = MODEL_STD
-    # Add fields:
-    for i in aio_fields.keys():
-        fld = models.new_field(aio_fields[i])
-        models.add_field(model, fld)
+
+    add_fields(models, model)
+
     # Add template
     template = models.new_template(aio_card)
 
-    fillTemplateAndModelFromFile(template, model)
+    fillTemplateAndModelFromFile(model)
 
     model["sortf"] = 0  # set sortfield to question
     models.add_template(model, template)
@@ -206,13 +207,29 @@ def addModel(col: Collection) -> dict[str, Any]:
     return model
 
 
+def add_fields(models, model):
+    for i in aio_fields.keys():
+        fld = models.new_field(aio_fields[i])
+        models.add_field(model, fld)
+
+
+def add_missing_fields(model, current_field_names: list[str]):
+    models = mw.col.models
+
+    for default_field_name in filter(
+        lambda n: not re.match(QUESTION_ID_PATTERN, n), aio_fields.values()
+    ):
+        if default_field_name not in current_field_names:
+            fld = models.new_field(default_field_name)
+            models.add_field(model, fld)
+
+
 def updateTemplate(col: Collection, user_config={}):
     """Update add-on note templates"""
     print(f"Updating {aio_model_name} note template")
     model = col.models.by_name(aio_model_name)
-    template = model["tmpls"][0]
 
-    fillTemplateAndModelFromFile(template, model, user_config)
+    fillTemplateAndModelFromFile(model, user_config)
     adjust_number_of_question_fields(model)
 
     col.models.save(model)
@@ -261,6 +278,8 @@ def update_multiple_choice_note_type_from_config(user_config: str, addon_name: s
 def remove_deleted_field_from_template(
     dialog: fields.FieldDialog, field: dict[str, Any]
 ):
+    """As this is called while using the addon this doesn't overwrite the
+    potentially user-modified template with the default"""
     model = dialog.model
 
     if model.get("name") == aio_model_name and re.search(
@@ -268,19 +287,24 @@ def remove_deleted_field_from_template(
     ):
         set_front_template(
             model,
-            get_front_template_with_removed_field(field, get_front_template_text()),
+            get_front_template_with_removed_field(
+                field, get_model_front_template_text()
+            ),
         )
         update_model(model)
 
 
 def add_added_field_to_template(dialog: fields.FieldDialog, field: dict[str, Any]):
+    """As this is called while using the addon this doesn't overwrite the
+    potentially user-modified template with the default"""
     model = dialog.model
 
     if model.get("name") == aio_model_name and re.search(
         QUESTION_ID_PATTERN, field.get("name")
     ):
         set_front_template(
-            model, get_front_template_with_added_field(field, get_front_template_text())
+            model,
+            get_front_template_with_added_field(field, get_model_front_template_text()),
         )
         update_model(model)
 
@@ -289,12 +313,36 @@ def set_front_template(model, template_text):
     model["tmpls"][0]["qfmt"] = template_text
 
 
+def set_back_template(model, template_text):
+    model["tmpls"][0]["afmt"] = template_text
+
+
 def update_model(model):
     mw.col.models.save(model)
 
 
-def get_front_template_text():
-    return get_model()["tmpls"][0]["qfmt"]
+def get_model_front_template_text(model: dict[str, Any] = None) -> str:
+    if model is None:
+        model = get_model()
+    return model["tmpls"][0]["qfmt"]
+
+
+@cache
+def get_default_front_template_text() -> str:
+    with open(get_addon_path() + "card/front.html", encoding="utf-8") as f:
+        return f.read()
+
+
+@cache
+def get_default_back_template_text() -> str:
+    with open(get_addon_path() + "card/back.html", encoding="utf-8") as f:
+        return f.read()
+
+
+@cache
+def get_default_css_template_text() -> str:
+    with open(get_addon_path() + "card/css.css", encoding="utf-8") as f:
+        return f.read()
 
 
 def get_front_template_with_removed_field(
