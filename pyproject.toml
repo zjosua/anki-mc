@@ -1,2 +1,7 @@
 [tool.black]
 extend-exclude = "^/src/multiple_choice/packaging"
+
+[tool.coverage.run]
+omit = [
+    "src/multiple_choice/packaging/*",
+]
