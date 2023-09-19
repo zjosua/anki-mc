@@ -1,7 +1,11 @@
 name: check-code
 run-name: Check ${{ github.event_name }} by @${{ github.actor }}
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - '*'
 
 jobs:
   lint:
