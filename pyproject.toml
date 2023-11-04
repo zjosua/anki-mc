@@ -5,3 +5,9 @@ extend-exclude = "^/src/multiple_choice/packaging"
 omit = [
     "src/multiple_choice/packaging/*",
 ]
+
+[tool.isort]
+profile = "black"
+extend_skip = [
+    "src/multiple_choice/packaging/",
+]
