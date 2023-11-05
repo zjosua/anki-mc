@@ -33,10 +33,9 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
-from anki.buildinfo import version as anki_version
+from anki.utils import pointVersion
 from aqt.gui_hooks import addon_config_editor_will_update_json, profile_did_open
 
-from .packaging import version
 from .template import (
     add_added_field_to_template,
     manage_multiple_choice_note_type,
@@ -44,9 +43,8 @@ from .template import (
     update_multiple_choice_note_type_from_config,
 )
 
-current_anki_version = version.parse(anki_version)
-field_deletion_hook_anki_version = version.parse("2.1.36")
-field_addition_hook_anki_version = version.parse("2.1.66")
+field_deletion_hook_anki_version = 36
+field_addition_hook_anki_version = 66
 
 # Only execute addon after profile and collection are fully initialized
 profile_did_open.append(manage_multiple_choice_note_type)
@@ -56,11 +54,11 @@ addon_config_editor_will_update_json.append(
 )
 
 
-if current_anki_version >= field_deletion_hook_anki_version:
+if pointVersion() >= field_deletion_hook_anki_version:
     from aqt.gui_hooks import fields_did_delete_field
 
     fields_did_delete_field.append(remove_deleted_field_from_template)
-if current_anki_version >= field_addition_hook_anki_version:
+if pointVersion() >= field_addition_hook_anki_version:
     from aqt.gui_hooks import fields_did_add_field
 
     fields_did_add_field.append(add_added_field_to_template)
