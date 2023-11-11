@@ -20,7 +20,8 @@ Adds multiple choice cards to Anki.
 
 ## Compatibility
 
-Anki 2.1.44 or higher is required for this add-on to work.
+Anki 2.1.55 or higher is required for the most recent version of this add-on to work.
+For Anki 2.1.44 to 2.1.54, you can use v2.8.0 (or lower) of the add-on.
 
 Cards created with this add-on can be reviewed with all Computer and mobile apps and on AnkiWeb.
 
