@@ -193,16 +193,16 @@ def addModel(col: Collection) -> dict[str, Any]:
     models = col.models
     model = models.new(aio_model_name)
     model["type"] = MODEL_STD
+    model["sortf"] = 0  # set sortfield to question
 
     add_fields(models, model)
 
     # Add template
     template = models.new_template(aio_card)
+    models.add_template(model, template)
 
     fillTemplateAndModelFromFile(model)
 
-    model["sortf"] = 0  # set sortfield to question
-    models.add_template(model, template)
     models.add(model)
     return model
 
