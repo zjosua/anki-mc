@@ -22,14 +22,13 @@
 <div class="hidden" id="Q_5">{{Q_5}}</div>
 
 <script>
+    // Options are modified according to user's meta.json in the addon's folder
+    const OPTIONS = {
+        maxQuestionsToShow: 0,
+        skipFlip: false
+    };
     // Generate the table depending on the type.
     function generateTable() {
-
-        // Options are modified according to user's meta.json in the addon's folder
-        const OPTIONS = {
-            maxQuestionsToShow: 0
-        };
-
         var type = document.getElementById("Card_Type").innerHTML;
         var table = document.createElement("table");
         var tbody = document.createElement("tbody");
@@ -210,7 +209,25 @@
             Persistence.setItem('Q_solutions', getCorrectAnswers());
             Persistence.setItem('qtable', document.getElementById("qtable").innerHTML);
         }
+        const type = document.getElementById("Card_Type").innerHTML;
+        if (type == 2 && OPTIONS.skipFlip && getUserAnswers().filter(a => a == 1).length == 1) {
+            flipToBack();
+        }
     }
+
+    // flipToBack reference to https://github.com/git9527/anki-awesome-select
+    function flipToBack() {
+        if (typeof pycmd !== "undefined") {
+            pycmd("ans")
+        } else if (typeof study !== "undefined") {
+            study.drawAnswer()
+        } else if (typeof AnkiDroidJS !== "undefined") {
+            showAnswer()
+        } else if (window.anki && window.sendMessage2) {
+            window.sendMessage2("ankitap", "midCenter")
+        }
+    }
+
 
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));

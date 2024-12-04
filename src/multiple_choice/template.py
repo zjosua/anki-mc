@@ -95,7 +95,8 @@ def getOptionsJavaScriptFromConfig(user_config, side: Template_side):
         "\n".join(
             [
                 "const OPTIONS = {",
-                f"    maxQuestionsToShow: {user_config['maxQuestionsToShow']}",
+                f"    maxQuestionsToShow: {user_config['maxQuestionsToShow']},",
+                f"    skipFlip: {'true' if user_config['skipFlip'] else 'false'}",
                 "};",
             ]
         )

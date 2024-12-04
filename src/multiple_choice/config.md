@@ -15,3 +15,6 @@
 - `maxQuestionsToShow` (`number`)
     - `0`: (default) Show all questions that are defined in the fields on the card
     - `n >= 1`: Show only `n` questions from the ones defined in the fields on the card
+- `skipFlip` (`bool`)
+    - `true`: Skip flipping the card after choosing an answer while using single choice questions.
+    - `false` (default): Flip the card after choosing an answer while using single choice questions.

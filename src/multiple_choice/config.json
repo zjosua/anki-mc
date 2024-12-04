@@ -3,5 +3,6 @@
     "colorQuestionTable": false,
     "colorAnswerTable": true,
     "hideAnswerTable": false,
-    "maxQuestionsToShow": 0
+    "maxQuestionsToShow": 0,
+    "skipFlip": false
 }
