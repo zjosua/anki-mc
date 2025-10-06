@@ -218,13 +218,13 @@
     // flipToBack reference to https://github.com/git9527/anki-awesome-select
     function flipToBack() {
         if (typeof pycmd !== "undefined") {
-            pycmd("ans")
+            pycmd("ans");
         } else if (typeof study !== "undefined") {
-            study.drawAnswer()
+            study.drawAnswer();
         } else if (typeof AnkiDroidJS !== "undefined") {
-            showAnswer()
+            showAnswer();
         } else if (window.anki && window.sendMessage2) {
-            window.sendMessage2("ankitap", "midCenter")
+            window.sendMessage2("ankitap", "midCenter");
         }
     }
 

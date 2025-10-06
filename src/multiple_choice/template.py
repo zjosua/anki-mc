@@ -1,5 +1,6 @@
 # Multiple Choice for Anki
 #
+# Copyright (C) 2018-2024  Maximilian Arzberger <https://github.com/Schlauer-Hax>
 # Copyright (C) 2018-2023  3ter <https://github.com/3ter>
 #                          zjosua <https://github.com/zjosua>
 #

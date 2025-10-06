@@ -1,7 +1,7 @@
 # Multiple Choice for Anki
 #
+# Copyright (C) 2018-2025  zjosua <https://github.com/zjosua>
 # Copyright (C) 2018-2023  3ter <https://github.com/3ter>
-#                          zjosua <https://github.com/zjosua>
 #
 # This file is based on config.py from Glutanimate's
 # Image Occlusion Enhanced Add-on for Anki
@@ -52,8 +52,8 @@ from .packaging import version
 
 # default configurations
 # TODO: update version number before release
-default_conf_local = {"version": "2.10.3"}
-default_conf_syncd = {"version": "2.10.3"}
+default_conf_local = {"version": "2.11.0"}
+default_conf_syncd = {"version": "2.11.0"}
 
 
 def getSyncedConfig():
