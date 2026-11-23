@@ -114,6 +114,25 @@
     }
 
     /**
+     * Shuffles an array in place with the Fisher-Yates algorithm, so every order is equally likely.
+     *
+     * Sorting with a random comparator is not a uniform shuffle: the result depends on the
+     * engine's sort algorithm and some orders come out far more often than others.
+     *
+     * @param   {array}     Array   array to shuffle
+     * @returns {Array}             the same array, shuffled
+     */
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            let tmp = array[i];
+            array[i] = array[j];
+            array[j] = tmp;
+        }
+        return array;
+    }
+
+    /**
      * Returns the shuffled and potentially reduced lines of HTML combined with their solution value
      *
      * In case of single choice it is guaranteed that the correct answer is shuffled in
@@ -128,8 +147,7 @@
         questionTableHtmlLinesToSolution, type, maxQuestionsToShow) {
 
         if (type != 2) {
-            shuffledQuestionTableHtmlLinesToSolution = questionTableHtmlLinesToSolution.sort(
-                () => Math.random() < 0.5 ? -1 : 1);
+            shuffledQuestionTableHtmlLinesToSolution = shuffle(questionTableHtmlLinesToSolution);
 
             if (maxQuestionsToShow > 1) {
                 return shuffledQuestionTableHtmlLinesToSolution.slice(0, maxQuestionsToShow);
@@ -141,7 +159,7 @@
             // To have the single correct answer randomly inserted into the wrong ones
             let correctAnswer = questionTableHtmlLinesToSolution.find(o => o.solution == 1);
             let wrongAnswers = questionTableHtmlLinesToSolution.filter(o => o.solution == 0);
-            wrongAnswers.sort(() => Math.random() < 0.5 ? -1 : 1);
+            shuffle(wrongAnswers);
 
             if (maxQuestionsToShow > 1) {
                 wrongAnswers = wrongAnswers.slice(0, maxQuestionsToShow - 1);
