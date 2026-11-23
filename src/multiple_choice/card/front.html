@@ -22,11 +22,22 @@
 <div class="hidden" id="Q_5">{{Q_5}}</div>
 
 <script>
-    // Options are modified according to user's meta.json in the addon's folder
-    const OPTIONS = {
-        maxQuestionsToShow: 0,
-        skipFlip: false
-    };
+    /**
+     * Returns the options of the front side.
+     *
+     * OPTIONS lives inside a function on purpose: Anki desktop reuses the page between cards,
+     * so a top-level `const` is declared again on the next card and the whole script fails
+     * with "Identifier 'OPTIONS' has already been declared".
+     */
+    function getOptions() {
+        // Options are modified according to user's meta.json in the addon's folder
+        const OPTIONS = {
+            maxQuestionsToShow: 0,
+            skipFlip: false
+        };
+        return OPTIONS;
+    }
+
     // Generate the table depending on the type.
     function generateTable() {
         var type = document.getElementById("Card_Type").innerHTML;
@@ -79,7 +90,7 @@
             }
         }
         let shuffledQuestionTableHtmlLinesToSolution = getShuffledQuestionTableHtmlLinesToSolution(
-            questionTableHtmlLinesToSolution, type, OPTIONS['maxQuestionsToShow']);
+            questionTableHtmlLinesToSolution, type, getOptions()['maxQuestionsToShow']);
 
         let shuffledHtmlLines = shuffledQuestionTableHtmlLinesToSolution
             .map(o => o.html)
@@ -210,7 +221,7 @@
             Persistence.setItem('qtable', document.getElementById("qtable").innerHTML);
         }
         const type = document.getElementById("Card_Type").innerHTML;
-        if (type == 2 && OPTIONS.skipFlip && getUserAnswers().filter(a => a == 1).length == 1) {
+        if (type == 2 && getOptions().skipFlip &&getUserAnswers().filter(a => a == 1).length == 1) {
             flipToBack();
         }
     }
